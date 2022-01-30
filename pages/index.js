@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-
+import Button from '../Components/Button';
 export default function Home() {
 	return (
 		<div className={styles.container}>
@@ -15,6 +15,21 @@ export default function Home() {
 					<img src='/assets/header-x1.png' width='100%' alt='header image' />
 					<span className={`${styles.headerTitle} bigFont`}>Electronics</span>
 				</header>
+				<div className={`${styles.filter} rowContainer`}>
+					<span className={`${styles.productsAmount} smallFont`}>16 of 32 products</span>
+					<div className={`rowContainer`}>
+						<span>Sort by:</span>
+						<Button clickeable={true} backgroundColor='#0ad4fa'>
+							Most Recent
+						</Button>
+						<Button clickeable={true} backgroundColor='#0ad4fa'>
+							Lowest price
+						</Button>
+						<Button clickeable={true} backgroundColor='#0ad4fa'>
+							Highest price
+						</Button>
+					</div>
+				</div>
 			</main>
 		</div>
 	);

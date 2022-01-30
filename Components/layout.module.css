@@ -7,10 +7,7 @@
 	background: rgba(245, 245, 245, 1);
 	box-shadow: 0px 0px 2px 0.1px rgba(15, 15, 15, 1);
 }
-.rowContainer {
-	display: flex;
-	align-items: center;
-}
+
 .aerolabLogo {
 	width: 100%;
 	margin: 5px;
@@ -19,5 +16,4 @@
 	padding: 5px;
 	margin: 0 10px;
 	background: #aaa;
-	border-radius: 10px;
 }

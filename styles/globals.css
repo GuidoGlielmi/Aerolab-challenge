@@ -26,5 +26,10 @@ a {
 }
 
 .smallFont {
-	font-size: 4rem;
+	font-size: 1rem;
+}
+
+.rowContainer {
+	display: flex;
+	align-items: center;
 }

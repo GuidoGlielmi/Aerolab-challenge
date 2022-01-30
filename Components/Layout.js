@@ -1,20 +1,21 @@
 import styles from './layout.module.css';
 import AerolabLogo from '../public/assets/aerolab-logo.svg';
 import Coin from '../public/assets/icons/coin.svg';
+import Button from '../Components/Button';
 
 const Layout = ({ children }) => {
 	return (
 		<>
-			<nav className={`${styles.rowContainer} ${styles.nav}`}>
+			<nav className={`rowContainer ${styles.nav}`}>
 				<div>
 					<AerolabLogo className={styles.aerolabLogo} />
 				</div>
-				<div className={styles.rowContainer}>
+				<div className='rowContainer'>
 					<span>John Kite</span>
-					<div className={`${styles.rowContainer} ${styles.coinBox}`}>
+					<Button backgroundColor='#aaa'>
 						<span>6000</span>
 						<Coin />
-					</div>
+					</Button>
 				</div>
 			</nav>
 			{children}

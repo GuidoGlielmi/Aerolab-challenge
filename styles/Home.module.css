@@ -3,10 +3,19 @@
 	z-index: 0;
 }
 .headerTitle {
-	position: absolute;
-	top: 80%;
-	left: 10%;
+	position: relative;
+	top: -130px;
+	left: 50px;
 	font-family: SourceSansPro-Bold;
 	font-weight: bold;
 	color: rgb(245, 245, 245);
+}
+.filter {
+	width: 70%;
+	margin: 0 auto;
+}
+.productsAmount {
+	margin: 0 15px;
+	padding: 5px 15px 5px 5px;
+	border-right: 1px #aaa solid;
 }

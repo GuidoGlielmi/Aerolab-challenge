@@ -1,0 +1,14 @@
+.boxOn {
+	padding: 6px 10px;
+	margin: 10px;
+	border-radius: 20px;
+	color: rgb(245, 245, 245);
+	user-select: none;
+}
+.boxOff {
+	padding: 6px 10px;
+	margin: 10px;
+	border-radius: 20px;
+	color: #a3a3a3;
+	user-select: none;
+}
