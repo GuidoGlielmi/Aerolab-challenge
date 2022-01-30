@@ -10,7 +10,12 @@ export default function Home() {
 				<link rel='icon' href='/favicon.ico' />
 			</Head>
 
-			<main className={styles.main}></main>
+			<main className={styles.main}>
+				<header className={styles.header}>
+					<img src='/assets/header-x1.png' width='100%' alt='header image' />
+					<span className={`${styles.headerTitle} bigFont`}>Electronics</span>
+				</header>
+			</main>
 		</div>
 	);
 }
