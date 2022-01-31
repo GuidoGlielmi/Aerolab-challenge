@@ -6,16 +6,24 @@
 	position: relative;
 	top: -130px;
 	left: 50px;
+	margin: 0px;
+	line-height: 50px;
 	font-family: SourceSansPro-Bold;
 	font-weight: bold;
 	color: rgb(245, 245, 245);
 }
 .filter {
 	width: 70%;
-	margin: 0 auto;
+	margin: 15px auto;
+	padding: 10px;
+	border-bottom: 0.1px rgb(200, 200, 200) solid;
 }
 .productsAmount {
 	margin: 0 15px;
 	padding: 5px 15px 5px 5px;
 	border-right: 1px #aaa solid;
+}
+.section {
+	width: 80%;
+	margin: auto;
 }

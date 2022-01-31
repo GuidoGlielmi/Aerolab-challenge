@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import Button from '../Components/Button';
+import Product from '../Components/Product';
 export default function Home() {
 	return (
 		<div className={styles.container}>
@@ -13,7 +14,7 @@ export default function Home() {
 			<main className={styles.main}>
 				<header className={styles.header}>
 					<img src='/assets/header-x1.png' width='100%' alt='header image' />
-					<span className={`${styles.headerTitle} bigFont`}>Electronics</span>
+					<h1 className={`${styles.headerTitle} bigFont`}>Electronics</h1>
 				</header>
 				<div className={`${styles.filter} rowContainer`}>
 					<span className={`${styles.productsAmount} smallFont`}>16 of 32 products</span>
@@ -30,6 +31,12 @@ export default function Home() {
 						</Button>
 					</div>
 				</div>
+				<section className={`${styles.section} wrapBox`}>
+					<Product />
+					<Product />
+					<Product />
+					<Product />
+				</section>
 			</main>
 		</div>
 	);
