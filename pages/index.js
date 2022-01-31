@@ -1,10 +1,13 @@
 import Head from 'next/head';
+import { useState } from 'react';
+
 import styles from '../styles/Home.module.css';
 import Button from '../Components/Button';
 import Product from '../Components/Product';
 import Arrow from '../public/assets/icons/arrow-right.svg';
 
 export default function Home() {
+	const [deviceButtons, setDeviceButtons] = useState(false);
 	return (
 		<div className={styles.container}>
 			<Head>
@@ -23,16 +26,43 @@ export default function Home() {
 				<div className={`${styles.filter} rowContainer`}>
 					<div className={`rowContainer`}>
 						<span className={`${styles.productsAmount} smallFont`}>16 of 32 products</span>
-						<span>Sort by:</span>
-						<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
-							Most Recent
-						</Button>
-						<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
-							Lowest price
-						</Button>
-						<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
-							Highest price
-						</Button>
+						<div className={`${styles.buttons} rowContainer`}>
+							<span>Sort by:</span>
+							<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+								Most Recent
+							</Button>
+							<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+								Lowest price
+							</Button>
+							<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+								Highest price
+							</Button>
+						</div>
+						<div className={`${styles.deviceButtons} columnContainer`}>
+							<Button
+								onClick={() => setDeviceButtons(!deviceButtons)}
+								toggling={true}
+								backgroundColor='#0ad4fa'
+								cursor='pointer'
+							>
+								Sort By
+							</Button>
+							{deviceButtons ? (
+								<>
+									<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+										Most Recent
+									</Button>
+									<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+										Lowest price
+									</Button>
+									<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+										Highest price
+									</Button>
+								</>
+							) : (
+								<></>
+							)}
+						</div>
 					</div>
 					<Arrow style={{ overflow: 'visible' }} />
 				</div>
