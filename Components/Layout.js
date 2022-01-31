@@ -1,9 +1,11 @@
+import React from 'react';
 import styles from './layout.module.css';
 import AerolabLogo from '../public/assets/aerolab-logo.svg';
 import Coin from '../public/assets/icons/coin.svg';
 import Button from '../Components/Button';
-
+import { useState } from 'react';
 const Layout = ({ children }) => {
+	const [{ points, name }, setUser] = useState({ points: '', name: '' });
 	return (
 		<>
 			<nav className={`rowContainer ${styles.nav}`}>
@@ -11,14 +13,14 @@ const Layout = ({ children }) => {
 					<AerolabLogo className={styles.aerolabLogo} />
 				</div>
 				<div className='rowContainer'>
-					<span>John Kite</span>
+					<span>{name}</span>
 					<Button cursor='default'>
-						<span>6000</span>
+						<span>{points}</span>
 						<Coin />
 					</Button>
 				</div>
 			</nav>
-			{children}
+			{React.cloneElement(children, { setUser })}
 		</>
 	);
 };

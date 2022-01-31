@@ -4,48 +4,85 @@ import BuyWhite from '../public/assets/icons/buy-white.svg';
 import Coin from '../public/assets/icons/coin.svg';
 import Button from './Button';
 import styles from './product.module.css';
-const Product = ({ src, title, category }) => {
+const Product = ({
+	product: {
+		name,
+		_id,
+		cost,
+		category,
+		img: { url },
+	},
+}) => {
 	const [clicked, setClicked] = useState(false);
-	return clicked ? (
+	return (
 		<div
-			className={`${styles.clickedBox} columnContainer`}
-			onMouseOut={() => setClicked(!clicked)}
-			onClick={() => setClicked(false)}
+			className={`${clicked ? styles.clickedBox : styles.box} columnContainer`}
+			onMouseEnter={() => setClicked(true)}
+			onMouseLeave={() => setClicked(false)}
+			onClick={() => setClicked(!clicked)}
 		>
-			<div className={`${styles.redeem} columnContainer`}>
-				<div className='rowContainer'>
-					<Coin />
-					<span className='mediumFont'>12000</span>
-				</div>
-				<Button size='xSmall' cursor='pointer'>
-					Redeem Now
-				</Button>
+			{clicked ? (
+				<>
+					<div className={`${styles.redeem} columnContainer`}>
+						<div className='rowContainer'>
+							<Coin />
+							<span className='mediumFont'>{cost}</span>
+						</div>
+						<Button size='xSmall' cursor='pointer'>
+							Redeem Now
+						</Button>
+					</div>
+					<BuyWhite className={styles.buyIcon} />
+				</>
+			) : (
+				<BuyBlue className={styles.buyIcon} />
+			)}
+			<div className={clicked ? 'reducedOpacity' : ''}>
+				<img src={url} alt='' />
 			</div>
-			<BuyWhite className={styles.buyIcon} />
-			<div className='reducedOpacity'>
-				<img src='/assets/product-pics/AcerAspire-x1.png' alt='' />
-			</div>
-			<div className={`${styles.info} reducedOpacity`}>
-				<h3 className={`${styles.category} xSmallFont`}>Phones</h3>
-				<h2 className={`${styles.title} smallFont`}>iPhone 8</h2>
-			</div>
-		</div>
-	) : (
-		<div
-			className={`${styles.box} columnContainer`}
-			onMouseOver={() => setClicked(!clicked)}
-			onClick={() => setClicked(true)}
-		>
-			<BuyBlue className={styles.buyIcon} />
-			<div>
-				<img src='/assets/product-pics/AcerAspire-x1.png' alt='' />
-			</div>
-			<div className={styles.info}>
-				<h3 className={`${styles.category} xSmallFont`}>Phones</h3>
-				<h2 className={`${styles.title} smallFont`}>iPhone 8</h2>
+			<div className={`${styles.info} ${clicked ? 'reducedOpacity' : ''}`}>
+				<h3 className={`${styles.category} xSmallFont`}>{category}</h3>
+				<h2 className={`${styles.title} smallFont`}>{name}</h2>
 			</div>
 		</div>
 	);
 };
+/* {
+    img: {
+      url: 'https://coding-challenge-api.aerolab.co/images/MotoG5-x1.png',
+      hdUrl: 'https://coding-challenge-api.aerolab.co/images/MotoG5-x2.png'
+    },
+    _id: '5a0b369e734d1d08bf708567',
+    name: 'Moto G5',
+    cost: 230,
+    category: 'Phones'
+  } */
+
+async function redeem(id) {
+	try {
+		const responseRaw = await fetch('https://coding-challenge-api.aerolab.co/redeem', {
+			method: 'POST',
+			body: JSON.stringify({ productId: id }),
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				Authorization:
+					'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWY2ZDczYWExMzI4NDAwMjFmMDU4ZDIiLCJpYXQiOjE2NDM1NjY5MDZ9.azfKP1anHgSy1fze1GSoxIGINVLf135uatTzeX-jg4Y',
+			},
+		});
+		if (responseRaw.status !== 200 && responseRaw.status !== 201 && responseRaw.status !== 204) {
+			const responseJson = await responseRaw.json();
+			throw new Error({ error: responseJson.error, status: `${responseRaw.status} ${responseRaw.statusText}` });
+		}
+		const responseJson = await responseRaw.json();
+		return {
+			props: {
+				user: responseJson,
+			},
+		};
+	} catch (e) {
+		console.log(e);
+	}
+}
 
 export default Product;

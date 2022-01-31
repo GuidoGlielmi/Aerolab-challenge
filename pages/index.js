@@ -1,12 +1,14 @@
 import Head from 'next/head';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import styles from '../styles/Home.module.css';
 import Button from '../Components/Button';
 import Product from '../Components/Product';
 import Arrow from '../public/assets/icons/arrow-right.svg';
 
-export default function Home() {
+export default function Home({ user, products, setUser }) {
+	useEffect(() => setUser({ name: user.name, points: user.points }), []);
+	console.log(products);
 	const [deviceButtons, setDeviceButtons] = useState(false);
 	return (
 		<div className={styles.container}>
@@ -66,10 +68,9 @@ export default function Home() {
 				</div>
 				<section className={`${styles.section} columnContainer`}>
 					<div className={`${styles.products} wrapBox`}>
-						<Product />
-						<Product />
-						<Product />
-						<Product />
+						{products.map((p) => (
+							<Product product={p} />
+						))}
 					</div>
 					<div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
 						<span>16 of 32 products</span>
@@ -79,4 +80,59 @@ export default function Home() {
 			</main>
 		</div>
 	);
+} /*'https://coding-challenge-api.aerolab.co/redeem
+' */
+export async function getStaticProps() {
+	try {
+		const userRaw = await fetch('https://coding-challenge-api.aerolab.co/user/me', {
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				Authorization:
+					'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWY2ZDczYWExMzI4NDAwMjFmMDU4ZDIiLCJpYXQiOjE2NDM1NjY5MDZ9.azfKP1anHgSy1fze1GSoxIGINVLf135uatTzeX-jg4Y',
+			},
+		});
+		if (userRaw.status !== 200 && userRaw.status !== 201 && userRaw.status !== 204) {
+			const userJson = await userRaw.json();
+			throw new Error({ error: userJson.error, status: `${userRaw.status} ${userRaw.statusText}` });
+		}
+		const userJson = await userRaw.json();
+		const productsRaw = await fetch('https://coding-challenge-api.aerolab.co/products', {
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				Authorization:
+					'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWY2ZDczYWExMzI4NDAwMjFmMDU4ZDIiLCJpYXQiOjE2NDM1NjY5MDZ9.azfKP1anHgSy1fze1GSoxIGINVLf135uatTzeX-jg4Y',
+			},
+		});
+		if (productsRaw.status !== 200 && productsRaw.status !== 201 && productsRaw.status !== 204) {
+			const productsJson = await productsRaw.json();
+			throw new Error({ error: productsJson.error, status: `${productsRaw.status} ${productsRaw.statusText}` });
+		}
+		const productsJson = await productsRaw.json();
+		return {
+			props: {
+				user: userJson,
+				products: productsJson,
+			},
+		};
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+function packer(array, packNumber) {
+	const entireArray = [];
+	let pack = [];
+	for (let index = 0; index < array.length; index++) {
+		if (array.length - (index + 1) < array.length % packNumber) {
+			pack.push(array[index]);
+			if (array.length - index === 1) entireArray.push(pack);
+		} else if (index !== 0 && (index + 1) % packNumber === 0) {
+			pack.push(array[index]);
+			entireArray.push(pack);
+			pack = [];
+		} else pack.push(array[index]);
+	}
+	return entireArray;
 }
