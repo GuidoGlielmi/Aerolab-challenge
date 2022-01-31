@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import styles from './button.module.css';
-const Button = ({ children, backgroundColor, toggling, size, cursor, onClick }) => {
+const Button = ({ children, backgroundColor, toggleable, size, cursor, clickHandler }) => {
 	const [toggleStyle, setToggleStyle] = useState(false);
-	return toggling ? (
+	return toggleable ? (
 		<div
 			onClick={() => {
-				if (!onClick) {
+				if (!clickHandler) {
 					return setToggleStyle(!toggleStyle);
 				}
-				onClick();
+				clickHandler();
 				setToggleStyle(!toggleStyle);
 			}}
 			style={{ background: toggleStyle ? backgroundColor : '#ddd', cursor }}
@@ -17,7 +17,11 @@ const Button = ({ children, backgroundColor, toggling, size, cursor, onClick }) 
 			{children}
 		</div>
 	) : (
-		<div style={{ cursor }} className={`${styles.boxOff} ${size ? size : 'small'}Font rowContainer`}>
+		<div
+			onClick={clickHandler ? () => clickHandler() : () => ''}
+			style={{ cursor }}
+			className={`${styles.boxOff} ${size ? size : 'small'}Font rowContainer`}
+		>
 			{children}
 		</div>
 	);

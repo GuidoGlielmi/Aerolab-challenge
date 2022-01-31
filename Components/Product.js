@@ -12,13 +12,18 @@ const Product = ({
 		category,
 		img: { url },
 	},
+	availablePoints,
 }) => {
 	const [clicked, setClicked] = useState(false);
+	const [coinCost, setCoinCost] = useState(cost);
 	return (
 		<div
 			className={`${clicked ? styles.clickedBox : styles.box} columnContainer`}
 			onMouseEnter={() => setClicked(true)}
-			onMouseLeave={() => setClicked(false)}
+			onMouseLeave={() => {
+				setClicked(false);
+				if (coinCost === 'Insufficient Points') setCoinCost(cost);
+			}}
 			onClick={() => setClicked(!clicked)}
 		>
 			{clicked ? (
@@ -26,9 +31,13 @@ const Product = ({
 					<div className={`${styles.redeem} columnContainer`}>
 						<div className='rowContainer'>
 							<Coin />
-							<span className='mediumFont'>{cost}</span>
+							<span className='smallFont'>{coinCost}</span>
 						</div>
-						<Button size='xSmall' cursor='pointer'>
+						<Button
+							size='xSmall'
+							cursor='pointer'
+							clickHandler={() => (cost > availablePoints ? setCoinCost('Insufficient Points') : redeem(_id))}
+						>
 							Redeem Now
 						</Button>
 					</div>
@@ -59,7 +68,8 @@ const Product = ({
   } */
 
 async function redeem(id) {
-	try {
+	console.log(id, 'redeem');
+	/* try {
 		const responseRaw = await fetch('https://coding-challenge-api.aerolab.co/redeem', {
 			method: 'POST',
 			body: JSON.stringify({ productId: id }),
@@ -82,7 +92,7 @@ async function redeem(id) {
 		};
 	} catch (e) {
 		console.log(e);
-	}
+	} */
 }
 
 export default Product;

@@ -8,7 +8,6 @@ import Arrow from '../public/assets/icons/arrow-right.svg';
 
 export default function Home({ user, products, setUser }) {
 	useEffect(() => setUser({ name: user.name, points: user.points }), []);
-	console.log(products);
 	const [deviceButtons, setDeviceButtons] = useState(false);
 	return (
 		<div className={styles.container}>
@@ -28,20 +27,20 @@ export default function Home({ user, products, setUser }) {
 						<span className={`${styles.productsAmount} smallFont`}>16 of 32 products</span>
 						<div className={`${styles.buttons} rowContainer`}>
 							<span>Sort by:</span>
-							<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+							<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
 								Most Recent
 							</Button>
-							<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+							<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
 								Lowest price
 							</Button>
-							<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+							<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
 								Highest price
 							</Button>
 						</div>
 						<div className={`${styles.deviceButtons} columnContainer`}>
 							<Button
 								onClick={() => setDeviceButtons(!deviceButtons)}
-								toggling={true}
+								toggleable={true}
 								backgroundColor='#0ad4fa'
 								cursor='pointer'
 							>
@@ -49,13 +48,13 @@ export default function Home({ user, products, setUser }) {
 							</Button>
 							{deviceButtons ? (
 								<>
-									<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+									<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
 										Most Recent
 									</Button>
-									<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+									<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
 										Lowest price
 									</Button>
-									<Button toggling={true} backgroundColor='#0ad4fa' cursor='pointer'>
+									<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
 										Highest price
 									</Button>
 								</>
@@ -68,8 +67,8 @@ export default function Home({ user, products, setUser }) {
 				</div>
 				<section className={`${styles.section} columnContainer`}>
 					<div className={`${styles.products} wrapBox`}>
-						{products.map((p) => (
-							<Product product={p} />
+						{products.map((p, index) => (
+							<Product key={index} product={p} availablePoints={user.points} />
 						))}
 					</div>
 					<div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
@@ -78,6 +77,11 @@ export default function Home({ user, products, setUser }) {
 					</div>
 				</section>
 			</main>
+			<footer className={styles.footer}>
+				<a target='_blank' href='https://github.com/GuidoGlielmi/Aerolab-challenge'>
+					Guido Glielmi's GitHub Repository
+				</a>
+			</footer>
 		</div>
 	);
 } /*'https://coding-challenge-api.aerolab.co/redeem

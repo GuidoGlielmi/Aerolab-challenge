@@ -8,8 +8,8 @@
 	box-shadow: 2px 2px 5px 0.1px rgba(150, 150, 150, 1);
 }
 .clickedBox {
+	align-items: center;
 	position: relative;
-	width: max-content;
 	margin: 20px;
 	padding: 30px 5px;
 	background-image: linear-gradient(-180deg, #0ad4fa 0%, #25bbf1 100%);
@@ -32,9 +32,6 @@
 }
 .redeem {
 	position: absolute;
-	align-self: center;
-	width: fit-content;
+	align-items: center;
 	z-index: 1;
-
-	opacity: 1;
 }
