@@ -4,11 +4,15 @@ import { useState, useEffect } from 'react';
 import styles from '../styles/Home.module.css';
 import Button from '../Components/Button';
 import Product from '../Components/Product';
-import Arrow from '../public/assets/icons/arrow-right.svg';
+import ArrowNext from '../public/assets/icons/arrow-right.svg';
+import ArrowPrevious from '../public/assets/icons/arrow-left.svg';
 
 export default function Home({ user, products, setUser }) {
+	console.log(products);
 	useEffect(() => setUser({ name: user.name, points: user.points }), []);
 	const [deviceButtons, setDeviceButtons] = useState(false);
+	const [productsArrayIndex, setProductsArrayIndex] = useState(0);
+
 	return (
 		<div className={styles.container}>
 			<Head>
@@ -24,7 +28,7 @@ export default function Home({ user, products, setUser }) {
 				</header>
 				<div className={styles.filter}>
 					<div className={styles.filterBox}>
-						<span className={`${styles.productsAmount} smallFont`}>16 of 32 products</span>
+						<span className={`${styles.productsAmount} smallFont`}>{`16 of 32 products`}</span>
 						<div className={`${styles.buttons} rowContainer`}>
 							<span>Sort by:</span>
 							<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
@@ -63,17 +67,39 @@ export default function Home({ user, products, setUser }) {
 							)}
 						</div>
 					</div>
-					<Arrow className={styles.arrow} />
+					<div>
+						{productsArrayIndex > 0 ? (
+							<ArrowPrevious className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
+						) : (
+							<></>
+						)}
+						{productsArrayIndex < products.length - 1 ? (
+							<ArrowNext className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
+						) : (
+							<></>
+						)}
+					</div>
 				</div>
 				<section className={`${styles.section} columnContainer`}>
 					<div className={`${styles.products} wrapBox`}>
-						{products.map((p, index) => (
+						{products[productsArrayIndex].map((p, index) => (
 							<Product key={index} product={p} availablePoints={user.points} />
 						))}
 					</div>
 					<div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
 						<span>16 of 32 products</span>
-						<Arrow />
+						<div>
+							{productsArrayIndex > 0 ? (
+								<ArrowPrevious className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
+							) : (
+								<></>
+							)}
+							{productsArrayIndex < products.length - 1 ? (
+								<ArrowNext className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
+							) : (
+								<></>
+							)}
+						</div>
 					</div>
 				</section>
 			</main>
@@ -114,10 +140,11 @@ export async function getStaticProps() {
 			throw new Error({ error: productsJson.error, status: `${productsRaw.status} ${productsRaw.statusText}` });
 		}
 		const productsJson = await productsRaw.json();
+		const orderedProducts = packer(productsJson, 7);
 		return {
 			props: {
 				user: userJson,
-				products: productsJson,
+				products: orderedProducts,
 			},
 		};
 	} catch (e) {

@@ -48,6 +48,7 @@
 }
 .arrow {
 	overflow: visible;
+	cursor: pointer;
 	margin: 10px;
 }
 .footer {
