@@ -18,13 +18,11 @@ export default function Home() {
 
 			<main className={styles.main}>
 				<header className={styles.header}>
-					<div className={styles.headerImage}></div>
-					{/*<img src='/assets/header-x1.png' width='100%' alt='header image' style={{ borderBottom: '5px' }} />
-					 */}
+					<img src='/assets/header-x1.png' width='100%' alt='header image' className={styles.headerImage} />
 					<h1 className={`${styles.headerTitle} bigFont`}>Electronics</h1>
 				</header>
-				<div className={`${styles.filter} rowContainer`}>
-					<div className={`rowContainer`}>
+				<div className={styles.filter}>
+					<div className={styles.filterBox}>
 						<span className={`${styles.productsAmount} smallFont`}>16 of 32 products</span>
 						<div className={`${styles.buttons} rowContainer`}>
 							<span>Sort by:</span>
@@ -64,7 +62,7 @@ export default function Home() {
 							)}
 						</div>
 					</div>
-					<Arrow style={{ overflow: 'visible' }} />
+					<Arrow className={styles.arrow} />
 				</div>
 				<section className={`${styles.section} columnContainer`}>
 					<div className={`${styles.products} wrapBox`}>

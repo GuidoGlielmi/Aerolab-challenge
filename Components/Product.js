@@ -7,7 +7,11 @@ import styles from './product.module.css';
 const Product = ({ src, title, category }) => {
 	const [clicked, setClicked] = useState(false);
 	return clicked ? (
-		<div className={`${styles.clickedBox} columnContainer`} onMouseOut={() => setClicked(!clicked)}>
+		<div
+			className={`${styles.clickedBox} columnContainer`}
+			onMouseOut={() => setClicked(!clicked)}
+			onClick={() => setClicked(false)}
+		>
 			<div className={`${styles.redeem} columnContainer`}>
 				<div className='rowContainer'>
 					<Coin />
@@ -27,7 +31,11 @@ const Product = ({ src, title, category }) => {
 			</div>
 		</div>
 	) : (
-		<div className={`${styles.box} columnContainer`} onMouseOver={() => setClicked(!clicked)}>
+		<div
+			className={`${styles.box} columnContainer`}
+			onMouseOver={() => setClicked(!clicked)}
+			onClick={() => setClicked(true)}
+		>
 			<BuyBlue className={styles.buyIcon} />
 			<div>
 				<img src='/assets/product-pics/AcerAspire-x1.png' alt='' />
