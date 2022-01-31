@@ -21,7 +21,7 @@ a {
 	font-size: 3rem;
 }
 .smallFont {
-	font-size: 1rem;
+	font-size: 1.4rem;
 }
 .xSmallFont {
 	font-size: 0.8rem;
@@ -29,13 +29,18 @@ a {
 .rowContainer {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 }
 .columnContainer {
 	display: flex;
 	flex-direction: column;
+	justify-content: center;
 }
 .wrapBox {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
+}
+.reducedOpacity {
+	opacity: 0.2;
 }
