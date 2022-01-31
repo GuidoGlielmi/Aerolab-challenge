@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
 				</div>
 				<div className='rowContainer'>
 					<span>John Kite</span>
-					<Button>
+					<Button cursor='default'>
 						<span>6000</span>
 						<Coin />
 					</Button>

@@ -13,9 +13,11 @@ const Product = ({ src, title, category }) => {
 					<Coin />
 					<span className='mediumFont'>12000</span>
 				</div>
-				<Button size='small'>Redeem Now</Button>
+				<Button size='xSmall' cursor='pointer'>
+					Redeem Now
+				</Button>
 			</div>
-			{clicked ? <BuyWhite className={styles.buyIcon} /> : <BuyBlue className={styles.buyIcon} />}
+			<BuyWhite className={styles.buyIcon} />
 			<div className='reducedOpacity'>
 				<img src='/assets/product-pics/AcerAspire-x1.png' alt='' />
 			</div>
@@ -26,7 +28,7 @@ const Product = ({ src, title, category }) => {
 		</div>
 	) : (
 		<div className={`${styles.box} columnContainer`} onMouseOver={() => setClicked(!clicked)}>
-			{clicked ? <BuyWhite className={styles.buyIcon} /> : <BuyBlue className={styles.buyIcon} />}
+			<BuyBlue className={styles.buyIcon} />
 			<div>
 				<img src='/assets/product-pics/AcerAspire-x1.png' alt='' />
 			</div>
