@@ -15,43 +15,51 @@ const Product = ({
 	availablePoints,
 }) => {
 	const [clicked, setClicked] = useState(false);
-	const [coinCost, setCoinCost] = useState(cost);
 	return (
-		<div
-			className={`${clicked ? styles.clickedBox : styles.box} columnContainer`}
-			onMouseEnter={() => setClicked(true)}
-			onMouseLeave={() => {
-				setClicked(false);
-				if (coinCost === 'Insufficient Points') setCoinCost(cost);
-			}}
-			onClick={() => setClicked(!clicked)}
-		>
-			{clicked ? (
-				<>
-					<div className={`${styles.redeem} columnContainer`}>
-						<div className='rowContainer'>
+		<div className={styles.products}>
+			<div
+				className={clicked ? styles.clickedBox : styles.box}
+				onMouseEnter={() => setClicked(true)}
+				onMouseLeave={() => setClicked(false)}
+				onClick={() => setClicked(!clicked)}
+			>
+				<div className={styles.buyIcon}>
+					{cost > availablePoints ? (
+						<Button>
+							<span>{`You need ${cost - availablePoints}`}</span>
 							<Coin />
-							<span className='smallFont'>{coinCost}</span>
-						</div>
+						</Button>
+					) : clicked ? (
+						<BuyWhite />
+					) : (
+						<BuyBlue />
+					)}
+				</div>
+				<img src={url} alt='' className={clicked ? 'reducedOpacity' : ''} />
+				<div className={`${clicked ? styles.boxInfo : 'hidden'} columnContainer`}>
+					<div className='rowContainer'>
+						<Coin />
+						<span className='smallFont'>{cost}</span>
+					</div>
+					{cost < availablePoints ? (
 						<Button
 							size='xSmall'
 							cursor='pointer'
-							clickHandler={() => (cost > availablePoints ? setCoinCost('Insufficient Points') : redeem(_id))}
+							clickHandler={(e) => {
+								e.stopPropagation();
+								redeem(_id);
+							}}
 						>
 							Redeem Now
 						</Button>
-					</div>
-					<BuyWhite className={styles.buyIcon} />
-				</>
-			) : (
-				<BuyBlue className={styles.buyIcon} />
-			)}
-			<div className={clicked ? 'reducedOpacity' : ''}>
-				<img src={url} alt='' />
-			</div>
-			<div className={`${styles.info} ${clicked ? 'reducedOpacity' : ''}`}>
-				<h3 className={`${styles.category} xSmallFont`}>{category}</h3>
-				<h2 className={`${styles.title} smallFont`}>{name}</h2>
+					) : (
+						<></>
+					)}
+				</div>
+				<div className={`${styles.info} ${clicked ? 'reducedOpacity' : ''}`}>
+					<h3 className={`${styles.category} xSmallFont`}>{category}</h3>
+					<h2 className={`${styles.title} smallFont`}>{name}</h2>
+				</div>
 			</div>
 		</div>
 	);

@@ -4,11 +4,11 @@ const Button = ({ children, backgroundColor, toggleable, size, cursor, clickHand
 	const [toggleStyle, setToggleStyle] = useState(false);
 	return toggleable ? (
 		<div
-			onClick={() => {
+			onClick={(e) => {
 				if (!clickHandler) {
 					return setToggleStyle(!toggleStyle);
 				}
-				clickHandler();
+				clickHandler(e);
 				setToggleStyle(!toggleStyle);
 			}}
 			style={{ background: toggleStyle ? backgroundColor : '#ddd', cursor }}
@@ -18,7 +18,7 @@ const Button = ({ children, backgroundColor, toggleable, size, cursor, clickHand
 		</div>
 	) : (
 		<div
-			onClick={clickHandler ? () => clickHandler() : () => ''}
+			onClick={clickHandler ? (e) => clickHandler(e) : () => ''}
 			style={{ cursor }}
 			className={`${styles.boxOff} ${size ? size : 'small'}Font rowContainer`}
 		>

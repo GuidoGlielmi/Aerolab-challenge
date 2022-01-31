@@ -1,20 +1,38 @@
+.products {
+	box-sizing: content-box;
+	position: relative;
+	width: max-content;
+	margin: 10px;
+}
 .box {
 	position: relative;
+	top: 0;
+	left: 0;
 	z-index: 0;
 	width: max-content;
-	margin: 20px;
 	padding: 30px 5px;
 	background: white;
 	box-shadow: 2px 2px 5px 0.1px rgba(150, 150, 150, 1);
 }
 .clickedBox {
-	align-items: center;
 	position: relative;
-	margin: 20px;
+	top: 0;
+	left: 0;
+	z-index: 0;
+	width: max-content;
 	padding: 30px 5px;
+	box-shadow: 2px 2px 5px 0.1px rgba(150, 150, 150, 1);
 	background-image: linear-gradient(-180deg, #0ad4fa 0%, #25bbf1 100%);
 	opacity: 0.8;
-	box-shadow: 2px 2px 5px 0.1px rgba(150, 150, 150, 1);
+}
+.boxInfo {
+	align-items: center;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
 }
 .info {
 	margin: 15px;
@@ -23,8 +41,16 @@
 }
 .buyIcon {
 	position: absolute;
-	top: 5px;
-	left: 81%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-end;
+	padding: 10px;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 1;
 }
 .category,
 .title {

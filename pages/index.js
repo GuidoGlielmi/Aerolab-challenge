@@ -8,7 +8,6 @@ import ArrowNext from '../public/assets/icons/arrow-right.svg';
 import ArrowPrevious from '../public/assets/icons/arrow-left.svg';
 
 export default function Home({ user, products, setUser }) {
-	console.log(products);
 	useEffect(() => setUser({ name: user.name, points: user.points }), []);
 	const [deviceButtons, setDeviceButtons] = useState(false);
 	const [productsArrayIndex, setProductsArrayIndex] = useState(0);
@@ -31,15 +30,21 @@ export default function Home({ user, products, setUser }) {
 						<span className={`${styles.productsAmount} smallFont`}>{`16 of 32 products`}</span>
 						<div className={`${styles.buttons} rowContainer`}>
 							<span>Sort by:</span>
-							<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-								Most Recent
-							</Button>
-							<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-								Lowest price
-							</Button>
-							<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-								Highest price
-							</Button>
+							<div className='button'>
+								<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
+									Most Recent
+								</Button>
+							</div>
+							<div className='button'>
+								<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
+									Lowest price
+								</Button>
+							</div>
+							<div className='button'>
+								<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
+									Highest price
+								</Button>
+							</div>
 						</div>
 						<div className={`${styles.deviceButtons} columnContainer`}>
 							<Button
@@ -81,7 +86,7 @@ export default function Home({ user, products, setUser }) {
 					</div>
 				</div>
 				<section className={`${styles.section} columnContainer`}>
-					<div className={`${styles.products} wrapBox`}>
+					<div style={{ position: 'relative' }} className={`wrapBox`}>
 						{products[productsArrayIndex].map((p, index) => (
 							<Product key={index} product={p} availablePoints={user.points} />
 						))}

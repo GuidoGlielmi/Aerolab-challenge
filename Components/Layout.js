@@ -6,6 +6,7 @@ import Button from '../Components/Button';
 import { useState } from 'react';
 const Layout = ({ children }) => {
 	const [{ points, name }, setUser] = useState({ points: '', name: '' });
+	const [modal, setModal] = useState(false);
 	return (
 		<>
 			<nav className={`rowContainer ${styles.nav}`}>
@@ -14,10 +15,17 @@ const Layout = ({ children }) => {
 				</div>
 				<div className='rowContainer'>
 					<span>{name}</span>
-					<Button cursor='default'>
-						<span>{points}</span>
-						<Coin />
-					</Button>
+					<div className='button'>
+						<Button cursor='default'>
+							<span>{points}</span>
+							<Coin />
+						</Button>
+					</div>
+					<div className='button'>
+						<Button clickHandler={() => setModal(true)} cursor='pointer'>
+							Get Points
+						</Button>
+					</div>
 				</div>
 			</nav>
 			{React.cloneElement(children, { setUser })}
