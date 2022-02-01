@@ -49,8 +49,11 @@ a {
 .hidden {
 	display: none;
 }
-.button {
+.marginSmall {
 	margin: 10px;
+}
+.marginMedium {
+	margin: 22px;
 }
 .modal {
 	display: flex;

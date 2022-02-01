@@ -61,8 +61,8 @@
 	}
 	.deviceButtons {
 		display: flex;
+		align-items: center;
 	}
-
 	.filter {
 		flex-direction: column;
 		align-items: center;
@@ -73,6 +73,11 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+	}
+	.filterVariables {
+		margin: 10px 0;
+		border-top: 1px solid black;
+		border-bottom: 1px solid black;
 	}
 	.productsAmount {
 		margin: 10px 15px;

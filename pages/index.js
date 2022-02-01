@@ -1,17 +1,56 @@
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect, useContext } from 'react';
 import styles from '../styles/Home.module.css';
+import buttonStyles from '../Components/button.module.css';
 import Button from '../Components/Button';
 import Product from '../Components/Product';
 import ArrowNext from '../public/assets/icons/arrow-right.svg';
 import ArrowPrevious from '../public/assets/icons/arrow-left.svg';
-
-export default function Home({ user, products, setUser }) {
-	useEffect(() => setUser({ name: user.name, points: user.points }), []);
+import { UserContext } from '../Components/Layout';
+const productAmountPerPage = 7;
+export default function Home({ user, products }) {
+	const { updatedUser, setUser } = useContext(UserContext);
 	const [deviceButtons, setDeviceButtons] = useState(false);
 	const [productsArrayIndex, setProductsArrayIndex] = useState(0);
+	const [updatedProducts, setUpdatedProducts] = useState(products);
+	const [lowestPrice, setLowestPrice] = useState(false);
+	const [highestPrice, setHighestPrice] = useState(false);
+	const [mostRecent, setMostRecent] = useState(false);
+	const [category, setCategory] = useState([]);
+	const [categories, setCategories] = useState([]);
 
+	useEffect(() => {
+		setUser(user);
+		const unpackedProducts = [].concat.apply([], products);
+		const categories = [];
+		let willAddCategory = true;
+		for (let index = 0; index < unpackedProducts.length; index++) {
+			for (let index2 = 0; index2 < categories.length; index2++) {
+				if (unpackedProducts[index].category === categories[index2]) {
+					willAddCategory = false;
+					break;
+				}
+			}
+			if (willAddCategory) categories.push(unpackedProducts[index].category);
+			willAddCategory = true;
+		}
+		setCategories(categories.sort((a, b) => a > b));
+	}, []);
+	const redeemProduct = (id) => {
+		setUpdatedProducts(updatedProducts.map((page) => page.filter(({ _id }) => _id !== id)));
+	};
+	const highestOrder = () => {
+		setUpdatedProducts(packer([].concat.apply([], updatedProducts).sort((a, b) => a.cost < b.cost)));
+	};
+	const lowestOrder = () => {
+		setUpdatedProducts(packer([].concat.apply([], updatedProducts).sort((a, b) => a.cost > b.cost)));
+	};
+	const categoryOrder = (selectedCategory) => {
+		console.log(packer([].concat.apply([], updatedProducts).filter(({ category }) => category === selectedCategory)));
+		setUpdatedProducts(
+			packer([].concat.apply([], updatedProducts).filter(({ category }) => category === selectedCategory))
+		);
+	};
 	return (
 		<div className={styles.container}>
 			<Head>
@@ -30,79 +69,182 @@ export default function Home({ user, products, setUser }) {
 						<span className={`${styles.productsAmount} smallFont`}>{`16 of 32 products`}</span>
 						<div className={`${styles.buttons} rowContainer`}>
 							<span>Sort by:</span>
-							<div className='button'>
-								<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
+							<div className='marginSmall'>
+								<Button
+									toggleable={true}
+									backgroundColor='#0ad4fa'
+									cursor='pointer'
+									clickHandler={() => {
+										if (!(!mostRecent || lowestPrice || highestPrice)) {
+											setUpdatedProducts(products);
+											setMostRecent(!mostRecent);
+											return;
+										}
+										!mostRecent
+											? setUpdatedProducts(packer(updatedUser.redeemHistory))
+											: setUpdatedProducts(updatedProducts);
+										setMostRecent(!mostRecent);
+									}}
+								>
 									Most Recent
 								</Button>
 							</div>
-							<div className='button'>
-								<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-									Lowest price
+							<div className='marginSmall'>
+								<Button
+									toggleable={true}
+									backgroundColor='#0ad4fa'
+									cursor='pointer'
+									clickHandler={() => {
+										if (!(mostRecent || !lowestPrice || highestPrice)) {
+											setUpdatedProducts(products);
+											setLowestPrice(!lowestPrice);
+											return;
+										}
+										lowestPrice ? setUpdatedProducts(updatedProducts) : lowestOrder();
+										setLowestPrice(!lowestPrice);
+										if (highestPrice) setHighestPrice(!highestPrice);
+									}}
+								>
+									Lowest Price
 								</Button>
 							</div>
-							<div className='button'>
-								<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-									Highest price
+							<div className='marginSmall'>
+								<Button
+									toggleable={true}
+									backgroundColor='#0ad4fa'
+									cursor='pointer'
+									clickHandler={() => {
+										if (!(mostRecent || lowestPrice || !highestPrice)) {
+											setUpdatedProducts(products);
+											setHighestPrice(!highestPrice);
+											return;
+										}
+										highestPrice ? setUpdatedProducts(updatedProducts) : highestOrder();
+										setHighestPrice(!highestPrice);
+										if (lowestPrice) setLowestPrice(!lowestPrice);
+									}}
+								>
+									Highest Price
 								</Button>
 							</div>
+							<select onChange={(e) => setCategory(e.target.value)} name='' id=''>
+								<option value=''>Category</option>
+								{categories.map((c, index) => (
+									<option
+										key={index}
+										onClick={(e) => {
+											if (!(mostRecent || lowestPrice || highestPrice || category)) {
+												setUpdatedProducts(products);
+												return;
+											}
+											categoryOrder(e.target.value);
+										}}
+									>
+										{c}
+									</option>
+								))}
+							</select>
 						</div>
 						<div className={`${styles.deviceButtons} columnContainer`}>
-							<Button
-								onClick={() => setDeviceButtons(!deviceButtons)}
-								toggleable={true}
-								backgroundColor='#0ad4fa'
-								cursor='pointer'
-							>
-								Sort By
-							</Button>
+							<div className='marginMedium'>
+								<Button
+									clickHandler={() => setDeviceButtons(!deviceButtons)}
+									toggleable={true}
+									backgroundColor='#0ad4fa'
+									cursor='pointer'
+								>
+									Sort By
+								</Button>
+							</div>
 							{deviceButtons ? (
-								<>
-									<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-										Most Recent
-									</Button>
-									<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-										Lowest price
-									</Button>
-									<Button toggleable={true} backgroundColor='#0ad4fa' cursor='pointer'>
-										Highest price
-									</Button>
-								</>
+								<div className={styles.filterVariables}>
+									<div className='marginSmall'>
+										<Button
+											toggleable={true}
+											backgroundColor='#0ad4fa'
+											cursor='pointer'
+											clickHandler={() => {
+												if (!(!mostRecent || lowestPrice || highestPrice)) {
+													setUpdatedProducts(products);
+													setMostRecent(!mostRecent);
+													return;
+												}
+												!mostRecent
+													? setUpdatedProducts(packer(updatedUser.redeemHistory))
+													: setUpdatedProducts(updatedProducts);
+												setMostRecent(!mostRecent);
+											}}
+										>
+											Most Recent
+										</Button>
+									</div>
+									<div className='marginSmall'>
+										<Button
+											toggleable={true}
+											backgroundColor='#0ad4fa'
+											cursor='pointer'
+											clickHandler={() => {
+												if (!(mostRecent || !lowestPrice || highestPrice)) {
+													setUpdatedProducts(products);
+													setLowestPrice(!lowestPrice);
+													return;
+												}
+												lowestPrice ? setUpdatedProducts(updatedProducts) : lowestOrder();
+												setLowestPrice(!lowestPrice);
+												if (highestPrice) setHighestPrice(!highestPrice);
+											}}
+										>
+											Lowest Price
+										</Button>
+									</div>
+									<div className='marginSmall'>
+										<Button
+											toggleable={true}
+											backgroundColor='#0ad4fa'
+											cursor='pointer'
+											clickHandler={() => {
+												if (!(mostRecent || lowestPrice || !highestPrice)) {
+													setUpdatedProducts(products);
+													setHighestPrice(!highestPrice);
+													return;
+												}
+												highestPrice ? setUpdatedProducts(updatedProducts) : highestOrder();
+												setHighestPrice(!highestPrice);
+												if (lowestPrice) setLowestPrice(!lowestPrice);
+											}}
+										>
+											Highest Price
+										</Button>
+									</div>
+								</div>
 							) : (
 								<></>
 							)}
 						</div>
 					</div>
 					<div>
-						{productsArrayIndex > 0 ? (
-							<ArrowPrevious className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
-						) : (
-							<></>
+						{productsArrayIndex > 0 && (
+							<ArrowPrevious className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex - 1)} />
 						)}
-						{productsArrayIndex < products.length - 1 ? (
+						{productsArrayIndex < updatedProducts.length - 1 && (
 							<ArrowNext className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
-						) : (
-							<></>
 						)}
 					</div>
 				</div>
 				<section className={`${styles.section} columnContainer`}>
 					<div style={{ position: 'relative' }} className={`wrapBox`}>
-						{products[productsArrayIndex].map((p, index) => (
-							<Product key={index} product={p} availablePoints={user.points} />
+						{updatedProducts[productsArrayIndex].map((p, index) => (
+							<Product key={index} product={p} availablePoints={updatedUser.points} redeemProduct={redeemProduct} />
 						))}
 					</div>
 					<div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
 						<span>16 of 32 products</span>
 						<div>
-							{productsArrayIndex > 0 ? (
-								<ArrowPrevious className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
-							) : (
-								<></>
+							{productsArrayIndex > 0 && (
+								<ArrowPrevious className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex - 1)} />
 							)}
-							{productsArrayIndex < products.length - 1 ? (
+							{productsArrayIndex < updatedProducts.length - 1 && (
 								<ArrowNext className={styles.arrow} onClick={() => setProductsArrayIndex(productsArrayIndex + 1)} />
-							) : (
-								<></>
 							)}
 						</div>
 					</div>
@@ -115,56 +257,47 @@ export default function Home({ user, products, setUser }) {
 			</footer>
 		</div>
 	);
-} /*'https://coding-challenge-api.aerolab.co/redeem
-' */
+}
+export async function getRequest(url) {
+	const responseRaw = await fetch(url, {
+		headers: {
+			'Content-Type': 'application/json',
+			Accept: 'application/json',
+			Authorization:
+				'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWY2ZDczYWExMzI4NDAwMjFmMDU4ZDIiLCJpYXQiOjE2NDM1NjY5MDZ9.azfKP1anHgSy1fze1GSoxIGINVLf135uatTzeX-jg4Y',
+		},
+	});
+	if (responseRaw.status !== 200 && responseRaw.status !== 201 && responseRaw.status !== 204) {
+		const responseJson = await responseRaw.json();
+		throw new Error({ error: responseJson.error, status: `${responseRaw.status} ${responseRaw.statusText}` });
+	}
+	const responseJson = await responseRaw.json();
+	return responseJson;
+}
 export async function getStaticProps() {
 	try {
-		const userRaw = await fetch('https://coding-challenge-api.aerolab.co/user/me', {
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-				Authorization:
-					'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWY2ZDczYWExMzI4NDAwMjFmMDU4ZDIiLCJpYXQiOjE2NDM1NjY5MDZ9.azfKP1anHgSy1fze1GSoxIGINVLf135uatTzeX-jg4Y',
-			},
-		});
-		if (userRaw.status !== 200 && userRaw.status !== 201 && userRaw.status !== 204) {
-			const userJson = await userRaw.json();
-			throw new Error({ error: userJson.error, status: `${userRaw.status} ${userRaw.statusText}` });
-		}
-		const userJson = await userRaw.json();
-		const productsRaw = await fetch('https://coding-challenge-api.aerolab.co/products', {
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-				Authorization:
-					'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWY2ZDczYWExMzI4NDAwMjFmMDU4ZDIiLCJpYXQiOjE2NDM1NjY5MDZ9.azfKP1anHgSy1fze1GSoxIGINVLf135uatTzeX-jg4Y',
-			},
-		});
-		if (productsRaw.status !== 200 && productsRaw.status !== 201 && productsRaw.status !== 204) {
-			const productsJson = await productsRaw.json();
-			throw new Error({ error: productsJson.error, status: `${productsRaw.status} ${productsRaw.statusText}` });
-		}
-		const productsJson = await productsRaw.json();
-		const orderedProducts = packer(productsJson, 7);
+		const user = await getRequest('https://coding-challenge-api.aerolab.co/user/me');
+		const products = await getRequest('https://coding-challenge-api.aerolab.co/products');
+		const orderedProducts = packer(products);
 		return {
 			props: {
-				user: userJson,
+				user,
 				products: orderedProducts,
 			},
+			revalidate: 1,
 		};
 	} catch (e) {
 		console.log(e);
 	}
 }
-
-function packer(array, packNumber) {
+function packer(array) {
 	const entireArray = [];
 	let pack = [];
 	for (let index = 0; index < array.length; index++) {
-		if (array.length - (index + 1) < array.length % packNumber) {
+		if (array.length - (index + 1) < array.length % productAmountPerPage) {
 			pack.push(array[index]);
 			if (array.length - index === 1) entireArray.push(pack);
-		} else if (index !== 0 && (index + 1) % packNumber === 0) {
+		} else if (index !== 0 && (index + 1) % productAmountPerPage === 0) {
 			pack.push(array[index]);
 			entireArray.push(pack);
 			pack = [];
@@ -172,3 +305,11 @@ function packer(array, packNumber) {
 	}
 	return entireArray;
 }
+/* {
+  _id: '61f6d73aa132840021f058d2',
+  name: 'John Kite',
+  points: 24200,
+  createDate: '2022-01-30T18:21:46.637Z',
+  redeemHistory: [],
+  __v: 0
+} */

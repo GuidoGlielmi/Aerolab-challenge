@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import BuyBlue from '../public/assets/icons/buy-blue.svg';
 import BuyWhite from '../public/assets/icons/buy-white.svg';
 import Coin from '../public/assets/icons/coin.svg';
 import Button from './Button';
 import styles from './product.module.css';
+import { postRequest } from './Layout';
+import { UserContext } from './Layout';
+import { getRequest } from '../pages/index';
 const Product = ({
 	product: {
 		name,
@@ -13,8 +16,21 @@ const Product = ({
 		img: { url },
 	},
 	availablePoints,
+	redeemProduct,
 }) => {
+	const { updatedUser, setUser } = useContext(UserContext);
 	const [clicked, setClicked] = useState(false);
+	async function redeem(e) {
+		e.stopPropagation();
+		try {
+			await postRequest(_id, 'productId', 'https://coding-challenge-api.aerolab.co/redeem');
+			const user = await getRequest('https://coding-challenge-api.aerolab.co/user/me');
+			setUser(user);
+			redeemProduct(_id);
+		} catch (err) {
+			console.log(err);
+		}
+	}
 	return (
 		<div className={styles.products}>
 			<div
@@ -42,14 +58,7 @@ const Product = ({
 						<span className='smallFont'>{cost}</span>
 					</div>
 					{cost < availablePoints ? (
-						<Button
-							size='xSmall'
-							cursor='pointer'
-							clickHandler={(e) => {
-								e.stopPropagation();
-								redeem(_id);
-							}}
-						>
+						<Button size='xSmall' cursor='pointer' clickHandler={(e) => redeem(e)}>
 							Redeem Now
 						</Button>
 					) : (
@@ -64,6 +73,7 @@ const Product = ({
 		</div>
 	);
 };
+
 /* {
     img: {
       url: 'https://coding-challenge-api.aerolab.co/images/MotoG5-x1.png',
@@ -74,33 +84,5 @@ const Product = ({
     cost: 230,
     category: 'Phones'
   } */
-
-async function redeem(id) {
-	console.log(id, 'redeem');
-	/* try {
-		const responseRaw = await fetch('https://coding-challenge-api.aerolab.co/redeem', {
-			method: 'POST',
-			body: JSON.stringify({ productId: id }),
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-				Authorization:
-					'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWY2ZDczYWExMzI4NDAwMjFmMDU4ZDIiLCJpYXQiOjE2NDM1NjY5MDZ9.azfKP1anHgSy1fze1GSoxIGINVLf135uatTzeX-jg4Y',
-			},
-		});
-		if (responseRaw.status !== 200 && responseRaw.status !== 201 && responseRaw.status !== 204) {
-			const responseJson = await responseRaw.json();
-			throw new Error({ error: responseJson.error, status: `${responseRaw.status} ${responseRaw.statusText}` });
-		}
-		const responseJson = await responseRaw.json();
-		return {
-			props: {
-				user: responseJson,
-			},
-		};
-	} catch (e) {
-		console.log(e);
-	} */
-}
 
 export default Product;

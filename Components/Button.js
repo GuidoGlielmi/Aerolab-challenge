@@ -8,8 +8,8 @@ const Button = ({ children, backgroundColor, toggleable, size, cursor, clickHand
 				if (!clickHandler) {
 					return setToggleStyle(!toggleStyle);
 				}
-				clickHandler(e);
 				setToggleStyle(!toggleStyle);
+				clickHandler(e);
 			}}
 			style={{ background: toggleStyle ? backgroundColor : '#ddd', cursor }}
 			className={`${toggleStyle ? styles.boxOn : styles.boxOff} ${size ? size : 'small'}Font rowContainer`}

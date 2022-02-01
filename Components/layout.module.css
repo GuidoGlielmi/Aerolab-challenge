@@ -17,3 +17,6 @@
 	margin: 0 10px;
 	background: #aaa;
 }
+.invalidInput {
+	border: 2px rgb(180, 0, 0) solid;
+}
