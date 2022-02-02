@@ -10,6 +10,7 @@ import { UserContext } from '../Components/Layout';
 const productAmountPerPage = 7;
 
 export default function Home({ user, products, packedProducts }) {
+  console.log(user.redeemHistory);
   const { updatedUser, setUser } = useContext(UserContext);
   const [deviceButtons, setDeviceButtons] = useState(false);
   const [productsArrayIndex, setProductsArrayIndex] = useState(0);
@@ -219,7 +220,7 @@ export default function Home({ user, products, packedProducts }) {
               )}
             </div>
           </div>
-          <div>
+          <div className='rowContainer'>
             {productsArrayIndex > 0 && (
               <ArrowPrevious
                 className={styles.arrow}

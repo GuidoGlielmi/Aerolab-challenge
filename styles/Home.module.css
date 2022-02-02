@@ -1,87 +1,87 @@
 .header {
-	position: relative;
+  position: relative;
 }
 .headerImage {
-	box-shadow: 0px -10px 30px 1px #42e0ff;
+  box-shadow: 0px -10px 30px 1px #42e0ff;
 }
 .headerTitle {
-	position: relative;
-	top: -130px;
-	left: 50px;
-	margin: 0px;
-	line-height: 50px;
-	font-family: SourceSansPro-Bold;
-	font-weight: bold;
-	color: rgb(245, 245, 245);
+  position: relative;
+  top: -130px;
+  left: 50px;
+  margin: 0px;
+  line-height: 50px;
+  font-family: SourceSansPro-Bold;
+  font-weight: bold;
+  color: rgb(245, 245, 245);
 }
 .filter {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	width: 70%;
-	margin: 15px auto;
-	padding: 10px;
-	border-bottom: 0.1px rgb(200, 200, 200) solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 70%;
+  margin: 15px auto;
+  padding: 10px;
+  border-bottom: 0.1px rgb(200, 200, 200) solid;
 }
 .filterBox {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .productsAmount {
-	margin: 10px 15px;
-	padding: 5px 15px 5px 5px;
-	border-right: 1px #aaa solid;
+  margin: 10px 15px;
+  padding: 5px 15px 5px 5px;
+  border-right: 1px #aaa solid;
 }
 .section {
-	width: 80%;
-	margin: auto;
+  width: 80%;
+  margin: auto;
 }
 .productsAmountFooter {
-	padding: 10px;
-	margin: 20px;
-	justify-content: space-between;
-	border-bottom: 1px solid rgb(200, 200, 200);
+  padding: 10px;
+  margin: 20px;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(200, 200, 200);
 }
 .deviceButtons {
-	display: none;
+  display: none;
 }
 .arrow {
-	overflow: visible;
-	cursor: pointer;
-	margin: 10px;
+  overflow: visible;
+  cursor: pointer;
+  margin: 10px;
 }
 .footer {
-	margin: 20px 0 40px;
-	text-align: center;
+  margin: 20px 0 40px;
+  text-align: center;
 }
 @media (max-width: 827px) {
-	.buttons {
-		display: none;
-	}
-	.deviceButtons {
-		display: flex;
-		align-items: center;
-	}
-	.filter {
-		flex-direction: column;
-		align-items: center;
-		justify-content: space-between;
-	}
-	.filterBox {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-	}
-	.filterVariables {
-		margin: 10px 0;
-		border-top: 1px solid black;
-		border-bottom: 1px solid black;
-	}
-	.productsAmount {
-		margin: 10px 15px;
-		padding: 5px 15px 5px 5px;
-		border-right: none;
-	}
+  .buttons {
+    display: none;
+  }
+  .deviceButtons {
+    display: flex;
+    align-items: center;
+  }
+  .filter {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .filterBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .filterVariables {
+    margin: 10px 0;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .productsAmount {
+    margin: 10px 15px;
+    padding: 5px 15px 5px 5px;
+    border-right: none;
+  }
 }
