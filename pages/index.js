@@ -20,9 +20,50 @@ export default function Home({ user, products, packedProducts }) {
   const [lowestPrice, setLowestPrice] = useState(false);
   const [highestPrice, setHighestPrice] = useState(false);
   const [mostRecent, setMostRecent] = useState(false);
-  const [category, setCategory] = useState([]);
+  const [category, setCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
-
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  const pageIndexes = indexesCalculator(updatedProducts.unpacked);
+  const pageIndexesString = `${pageIndexes[productsArrayIndex] + 1} to ${
+    pageIndexes[productsArrayIndex + 1]
+  } of ${pageIndexes[pageIndexes.length - 1]} products`;
+  function filter(changedVariable, variableValue) {
+    let filteredElements = products.map((p) => p);
+    if (
+      (changedVariable === 'mostRecent' && !mostRecent) ||
+      (changedVariable !== 'mostRecent' && mostRecent)
+    ) {
+      filteredElements = getFilteredRedeemProducts(variableValue);
+      setUpdatedProducts({ packed: packer(filteredElements), unpacked: filteredElements });
+      return;
+    }
+    if (
+      (changedVariable === 'lowestPrice' && !lowestPrice) ||
+      (changedVariable !== 'lowestPrice' && lowestPrice)
+    ) {
+      filteredElements.sort((a, b) => a.cost > b.cost);
+    }
+    if (
+      (changedVariable === 'highestPrice' && !highestPrice) ||
+      (changedVariable !== 'highestPrice' && highestPrice)
+    ) {
+      filteredElements.sort((a, b) => a.cost < b.cost);
+    }
+    if (changedVariable === 'category' && variableValue) {
+      filteredElements = filteredElements.filter(({ category }) => category === variableValue);
+    }
+    setUpdatedProducts({ packed: packer(filteredElements), unpacked: filteredElements });
+  }
+  function getFilteredRedeemProducts(selectedCategory) {
+    let filteredElements = updatedUser.redeemHistory.map((rh) => rh);
+    if (lowestPrice) filteredElements.sort((a, b) => a.cost > b.cost);
+    if (highestPrice) filteredElements.sort((a, b) => a.cost < b.cost);
+    if (selectedCategory) {
+      filteredElements = filteredElements.filter(({ category }) => category === selectedCategory);
+    }
+    return filteredElements;
+  }
   useEffect(() => {
     setUser(user);
     const categories = getUniqueElements(products, 'category').uniqueElements;
@@ -66,11 +107,7 @@ export default function Home({ user, products, packedProducts }) {
         </header>
         <div className={styles.filter}>
           <div className={styles.filterBox}>
-            <span className={`${styles.productsAmount} smallFont`}>{`${
-              indexesCalculator(updatedProducts.unpacked)[productsArrayIndex]
-            } to ${indexesCalculator(updatedProducts.unpacked)[productsArrayIndex + 1]} of ${
-              updatedProducts.unpacked.length
-            } products`}</span>
+            <span className={`${styles.productsAmount} smallFont`}>{pageIndexesString}</span>
             <div className={`${styles.buttons} rowContainer`}>
               <span>Sort by:</span>
               <div className='marginSmall'>
@@ -79,17 +116,7 @@ export default function Home({ user, products, packedProducts }) {
                   backgroundColor='#0ad4fa'
                   cursor='pointer'
                   clickHandler={() => {
-                    if (!(!mostRecent || lowestPrice || highestPrice || category[0])) {
-                      setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                      setMostRecent(!mostRecent);
-                      return;
-                    }
-                    !mostRecent
-                      ? setUpdatedProducts({
-                          packed: packer(updatedUser.redeemHistory),
-                          unpacked: updatedUser.redeemHistory,
-                        })
-                      : setUpdatedProducts(updatedProducts);
+                    filter('mostRecent');
                     setMostRecent(!mostRecent);
                   }}
                 >
@@ -99,14 +126,9 @@ export default function Home({ user, products, packedProducts }) {
               <div className='marginSmall'>
                 <div
                   onClick={() => {
-                    if (!(mostRecent || !lowestPrice || highestPrice || category[0])) {
-                      setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                      setLowestPrice(!lowestPrice);
-                      return;
-                    }
-                    lowestPrice ? setUpdatedProducts(updatedProducts) : lowestOrder();
-                    setLowestPrice(!lowestPrice);
+                    filter('lowestPrice');
                     if (highestPrice) setHighestPrice(false);
+                    setLowestPrice(!lowestPrice);
                   }}
                   style={{ background: lowestPrice ? '#0ad4fa' : '#ddd', cursor: 'pointer' }}
                   className={`${
@@ -119,14 +141,9 @@ export default function Home({ user, products, packedProducts }) {
               <div className='marginSmall'>
                 <div
                   onClick={() => {
-                    if (!(mostRecent || lowestPrice || !highestPrice || category[0])) {
-                      setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                      setHighestPrice(!highestPrice);
-                      return;
-                    }
-                    highestPrice ? setUpdatedProducts(updatedProducts) : highestOrder();
-                    setHighestPrice(!highestPrice);
+                    filter('highestPrice');
                     if (lowestPrice) setLowestPrice(false);
+                    setHighestPrice(!highestPrice);
                   }}
                   style={{ background: highestPrice ? '#0ad4fa' : '#ddd', cursor: 'pointer' }}
                   className={`${
@@ -136,30 +153,12 @@ export default function Home({ user, products, packedProducts }) {
                   Highest Price
                 </div>
               </div>
-              <select onChange={(e) => setCategory(e.target.value)} name='' id=''>
-                <option
-                  value=''
-                  onClick={(e) => {
-                    if (!(mostRecent || lowestPrice || highestPrice || category[0])) {
-                      setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                      return;
-                    }
-                    categoryOrder(e.target.value);
-                  }}
-                >
+              <select name='' id=''>
+                <option value='' onClick={(e) => filter('category', e.target.value)}>
                   Category
                 </option>
                 {categories.map((c, index) => (
-                  <option
-                    key={index}
-                    onClick={(e) => {
-                      if (!(mostRecent || lowestPrice || highestPrice || category[0])) {
-                        setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                        return;
-                      }
-                      categoryOrder(e.target.value);
-                    }}
-                  >
+                  <option key={index} onClick={(e) => filter('category', e.target.value)}>
                     {c}
                   </option>
                 ))}
@@ -184,14 +183,7 @@ export default function Home({ user, products, packedProducts }) {
                       backgroundColor='#0ad4fa'
                       cursor='pointer'
                       clickHandler={() => {
-                        if (!(!mostRecent || lowestPrice || highestPrice || category[0])) {
-                          setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                          setMostRecent(!mostRecent);
-                          return;
-                        }
-                        !mostRecent
-                          ? setUpdatedProducts(packer(updatedUser.redeemHistory))
-                          : setUpdatedProducts(updatedProducts);
+                        filter('mostRecent');
                         setMostRecent(!mostRecent);
                       }}
                     >
@@ -201,14 +193,9 @@ export default function Home({ user, products, packedProducts }) {
                   <div className='marginSmall'>
                     <div
                       onClick={() => {
-                        if (!(mostRecent || !lowestPrice || highestPrice || category[0])) {
-                          setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                          setLowestPrice(!lowestPrice);
-                          return;
-                        }
-                        lowestPrice ? setUpdatedProducts(updatedProducts) : lowestOrder();
-                        setLowestPrice(!lowestPrice);
+                        filter('lowestPrice');
                         if (highestPrice) setHighestPrice(false);
+                        setLowestPrice(!lowestPrice);
                       }}
                       style={{ background: lowestPrice ? '#0ad4fa' : '#ddd', cursor: 'pointer' }}
                       className={`${
@@ -221,14 +208,9 @@ export default function Home({ user, products, packedProducts }) {
                   <div className='marginSmall'>
                     <div
                       onClick={() => {
-                        if (!(mostRecent || lowestPrice || !highestPrice || category[0])) {
-                          setUpdatedProducts({ packed: packedProducts, unpacked: products });
-                          setHighestPrice(!highestPrice);
-                          return;
-                        }
-                        highestPrice ? setUpdatedProducts(updatedProducts) : highestOrder();
-                        setHighestPrice(!highestPrice);
+                        filter('highestPrice');
                         if (lowestPrice) setLowestPrice(false);
+                        setHighestPrice(!highestPrice);
                       }}
                       style={{ background: highestPrice ? '#0ad4fa' : '#ddd', cursor: 'pointer' }}
                       className={`${
@@ -271,11 +253,11 @@ export default function Home({ user, products, packedProducts }) {
                 />
               ))
             ) : (
-              <div>No products available</div>
+              <div className='marginMedium'>No products available</div>
             )}
           </div>
           <div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
-            <span>16 of 32 products</span>
+            <span>{pageIndexesString}</span>
             <div>
               {productsArrayIndex > 0 && (
                 <ArrowPrevious
@@ -378,7 +360,7 @@ function indexesCalculator(array) {
   const divisionNumbers = [0];
   for (let index = 0; index < array.length; index++) {
     if (index !== 0 && (index + 1) % productAmountPerPage === 0) {
-      divisionNumbers.push(index);
+      divisionNumbers.push(index + 1);
     }
   }
   divisionNumbers.push(array.length);
@@ -391,9 +373,10 @@ function indexesCalculator(array) {
   createDate: '2022-01-30T18:21:46.637Z',
   redeemHistory: [],
   __v: 0
-} */
-/*packer(
-	updatedProducts.unpacked.filter(
-		(up) =>
-      !updatedUser.redeemHistory.map(({ _id }) => _id).includes(up._id),
-  ) */
+} 
+packer(
+  updatedProducts.unpacked.filter((up) => {
+    !updatedUser.redeemHistory.map(({ _id }) => _id).includes(up._id);
+  }),
+);
+*/
