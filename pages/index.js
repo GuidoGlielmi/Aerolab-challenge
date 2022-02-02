@@ -13,29 +13,33 @@ export default function Home({ user, products, packedProducts }) {
   const { updatedUser, setUser } = useContext(UserContext);
   const [deviceButtons, setDeviceButtons] = useState(false);
   const [productsArrayIndex, setProductsArrayIndex] = useState(0);
-  const [updatedProducts, setUpdatedProducts] = useState({
+  const [unredeemedProducts, setUnredeemProducts] = useState(products);
+  const [filteredProducts, setFilteredProducts] = useState({
     packed: packedProducts,
     unpacked: products,
   });
+  /* products is the complete list of products used as base array for
+  unredeemedProducts.
+  unredeemedProducts only gets updated when redeeming, and that's
+  the base array used for the filter.
+  filteredProducts is the unredeemedProducts filtered
+  */
   const [lowestPrice, setLowestPrice] = useState(false);
   const [highestPrice, setHighestPrice] = useState(false);
   const [mostRecent, setMostRecent] = useState(false);
-  const [category, setCategory] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState(products);
-  const pageIndexes = indexesCalculator(updatedProducts.unpacked);
+  const pageIndexes = indexesCalculator(filteredProducts.unpacked);
   const pageIndexesString = `${pageIndexes[productsArrayIndex] + 1} to ${
     pageIndexes[productsArrayIndex + 1]
   } of ${pageIndexes[pageIndexes.length - 1]} products`;
+
   function filter(changedVariable, variableValue) {
-    let filteredElements = products.map((p) => p);
+    let filteredElements = unredeemedProducts.map((p) => p);
     if (
       (changedVariable === 'mostRecent' && !mostRecent) ||
       (changedVariable !== 'mostRecent' && mostRecent)
     ) {
-      filteredElements = getFilteredRedeemProducts(variableValue);
-      setUpdatedProducts({ packed: packer(filteredElements), unpacked: filteredElements });
+      setFilteredProducts(getFilteredRedeemedProducts(variableValue));
       return;
     }
     if (
@@ -53,40 +57,29 @@ export default function Home({ user, products, packedProducts }) {
     if (changedVariable === 'category' && variableValue) {
       filteredElements = filteredElements.filter(({ category }) => category === variableValue);
     }
-    setUpdatedProducts({ packed: packer(filteredElements), unpacked: filteredElements });
+    setFilteredProducts({ packed: packer(filteredElements), unpacked: filteredElements });
   }
-  function getFilteredRedeemProducts(selectedCategory) {
+  function getFilteredRedeemedProducts(selectedCategory) {
     let filteredElements = updatedUser.redeemHistory.map((rh) => rh);
     if (lowestPrice) filteredElements.sort((a, b) => a.cost > b.cost);
     if (highestPrice) filteredElements.sort((a, b) => a.cost < b.cost);
     if (selectedCategory) {
       filteredElements = filteredElements.filter(({ category }) => category === selectedCategory);
     }
-    return filteredElements;
+    return { packed: packer(filteredElements), unpacked: filteredElements };
+  }
+  function redeemProduct(id) {
+    const unpacked = filteredProducts.filter(({ _id }) => _id !== id);
+    const unpackedUnredeemed = unredeemedProducts.filter(({ _id }) => _id !== id);
+    setUnredeemProducts(unpackedUnredeemed);
+    setFilteredProducts({ packed: packer(unpacked), unpacked });
   }
   useEffect(() => {
     setUser(user);
     const categories = getUniqueElements(products, 'category').uniqueElements;
     setCategories(categories.sort((a, b) => a > b));
   }, []);
-  const redeemProduct = (id) => {
-    const unpacked = updatedProducts.unpacked.filter(({ _id }) => _id !== id);
-    setUpdatedProducts({ packed: packer(unpacked), unpacked });
-  };
-  const highestOrder = () => {
-    const unpacked = updatedProducts.unpacked.sort((a, b) => a.cost < b.cost);
-    setUpdatedProducts({ packed: packer(unpacked), unpacked });
-  };
-  const lowestOrder = () => {
-    const unpacked = updatedProducts.unpacked.sort((a, b) => a.cost > b.cost);
-    setUpdatedProducts({ packed: packer(unpacked), unpacked });
-  };
-  const categoryOrder = (selectedCategory) => {
-    const unpacked = updatedProducts.unpacked.filter(
-      ({ category }) => category === selectedCategory,
-    );
-    setUpdatedProducts({ packed: packer(unpacked), unpacked });
-  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -233,7 +226,7 @@ export default function Home({ user, products, packedProducts }) {
                 onClick={() => setProductsArrayIndex(productsArrayIndex - 1)}
               />
             )}
-            {productsArrayIndex < updatedProducts.packed.length - 1 && (
+            {productsArrayIndex < filteredProducts.packed.length - 1 && (
               <ArrowNext
                 className={styles.arrow}
                 onClick={() => setProductsArrayIndex(productsArrayIndex + 1)}
@@ -243,8 +236,8 @@ export default function Home({ user, products, packedProducts }) {
         </div>
         <section className={`${styles.section} columnContainer`}>
           <div style={{ position: 'relative' }} className={`wrapBox`}>
-            {updatedProducts.packed[0] ? (
-              updatedProducts.packed[productsArrayIndex].map((p, index) => (
+            {filteredProducts.packed[0] ? (
+              filteredProducts.packed[productsArrayIndex].map((p, index) => (
                 <Product
                   key={index}
                   product={p}
@@ -265,7 +258,7 @@ export default function Home({ user, products, packedProducts }) {
                   onClick={() => setProductsArrayIndex(productsArrayIndex - 1)}
                 />
               )}
-              {productsArrayIndex < updatedProducts.packed.length - 1 && (
+              {productsArrayIndex < filteredProducts.packed.length - 1 && (
                 <ArrowNext
                   className={styles.arrow}
                   onClick={() => setProductsArrayIndex(productsArrayIndex + 1)}
@@ -375,7 +368,7 @@ function indexesCalculator(array) {
   __v: 0
 } 
 packer(
-  updatedProducts.unpacked.filter((up) => {
+  filteredProducts.unpacked.filter((up) => {
     !updatedUser.redeemHistory.map(({ _id }) => _id).includes(up._id);
   }),
 );
