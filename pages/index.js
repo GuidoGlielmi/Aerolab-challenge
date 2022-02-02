@@ -25,18 +25,7 @@ export default function Home({ user, products, packedProducts }) {
 
   useEffect(() => {
     setUser(user);
-    const categories = [];
-    let willAddCategory = true;
-    for (let index = 0; index < products.length; index++) {
-      for (let index2 = 0; index2 < categories.length; index2++) {
-        if (products[index].category === categories[index2]) {
-          willAddCategory = false;
-          break;
-        }
-      }
-      if (willAddCategory) categories.push(products[index].category);
-      willAddCategory = true;
-    }
+    const categories = getUniqueElements(products, 'category').uniqueElements;
     setCategories(categories.sort((a, b) => a > b));
   }, []);
   const redeemProduct = (id) => {
@@ -90,7 +79,7 @@ export default function Home({ user, products, packedProducts }) {
                   backgroundColor='#0ad4fa'
                   cursor='pointer'
                   clickHandler={() => {
-                    if (!(!mostRecent || lowestPrice || highestPrice)) {
+                    if (!(!mostRecent || lowestPrice || highestPrice || category[0])) {
                       setUpdatedProducts({ packed: packedProducts, unpacked: products });
                       setMostRecent(!mostRecent);
                       return;
@@ -110,7 +99,7 @@ export default function Home({ user, products, packedProducts }) {
               <div className='marginSmall'>
                 <div
                   onClick={() => {
-                    if (!(mostRecent || !lowestPrice || highestPrice)) {
+                    if (!(mostRecent || !lowestPrice || highestPrice || category[0])) {
                       setUpdatedProducts({ packed: packedProducts, unpacked: products });
                       setLowestPrice(!lowestPrice);
                       return;
@@ -130,7 +119,7 @@ export default function Home({ user, products, packedProducts }) {
               <div className='marginSmall'>
                 <div
                   onClick={() => {
-                    if (!(mostRecent || lowestPrice || !highestPrice)) {
+                    if (!(mostRecent || lowestPrice || !highestPrice || category[0])) {
                       setUpdatedProducts({ packed: packedProducts, unpacked: products });
                       setHighestPrice(!highestPrice);
                       return;
@@ -195,7 +184,7 @@ export default function Home({ user, products, packedProducts }) {
                       backgroundColor='#0ad4fa'
                       cursor='pointer'
                       clickHandler={() => {
-                        if (!(!mostRecent || lowestPrice || highestPrice)) {
+                        if (!(!mostRecent || lowestPrice || highestPrice || category[0])) {
                           setUpdatedProducts({ packed: packedProducts, unpacked: products });
                           setMostRecent(!mostRecent);
                           return;
@@ -212,7 +201,7 @@ export default function Home({ user, products, packedProducts }) {
                   <div className='marginSmall'>
                     <div
                       onClick={() => {
-                        if (!(mostRecent || !lowestPrice || highestPrice)) {
+                        if (!(mostRecent || !lowestPrice || highestPrice || category[0])) {
                           setUpdatedProducts({ packed: packedProducts, unpacked: products });
                           setLowestPrice(!lowestPrice);
                           return;
@@ -232,7 +221,7 @@ export default function Home({ user, products, packedProducts }) {
                   <div className='marginSmall'>
                     <div
                       onClick={() => {
-                        if (!(mostRecent || lowestPrice || !highestPrice)) {
+                        if (!(mostRecent || lowestPrice || !highestPrice || category[0])) {
                           setUpdatedProducts({ packed: packedProducts, unpacked: products });
                           setHighestPrice(!highestPrice);
                           return;
@@ -272,14 +261,18 @@ export default function Home({ user, products, packedProducts }) {
         </div>
         <section className={`${styles.section} columnContainer`}>
           <div style={{ position: 'relative' }} className={`wrapBox`}>
-            {updatedProducts.packed[productsArrayIndex].map((p, index) => (
-              <Product
-                key={index}
-                product={p}
-                availablePoints={updatedUser.points}
-                redeemProduct={redeemProduct}
-              />
-            ))}
+            {updatedProducts.packed[0] ? (
+              updatedProducts.packed[productsArrayIndex].map((p, index) => (
+                <Product
+                  key={index}
+                  product={p}
+                  availablePoints={updatedUser.points}
+                  redeemProduct={redeemProduct}
+                />
+              ))
+            ) : (
+              <div>No products available</div>
+            )}
           </div>
           <div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
             <span>16 of 32 products</span>
@@ -311,6 +304,24 @@ export default function Home({ user, products, packedProducts }) {
       </footer>
     </div>
   );
+}
+function getUniqueElements(array, variable) {
+  const uniqueElements = [];
+  let willAddElement = true;
+  for (let index = 0; index < array.length; index++) {
+    for (let index2 = 0; index2 < uniqueElements.length; index2++) {
+      if (array[index][variable] === uniqueElements[index2]) {
+        willAddElement = false;
+        break;
+      }
+    }
+    if (willAddElement) uniqueElements.push(array[index][variable]);
+    willAddElement = true;
+  }
+  const repetitionAmounts = uniqueElements.map(
+    (ue) => array.filter((element) => element[variable] === ue).length,
+  );
+  return { uniqueElements, repetitionAmounts };
 }
 export async function getRequest(url) {
   const responseRaw = await fetch(url, {
@@ -381,3 +392,8 @@ function indexesCalculator(array) {
   redeemHistory: [],
   __v: 0
 } */
+/*packer(
+	updatedProducts.unpacked.filter(
+		(up) =>
+      !updatedUser.redeemHistory.map(({ _id }) => _id).includes(up._id),
+  ) */
