@@ -10,7 +10,6 @@ import { UserContext } from '../Components/Layout';
 const productAmountPerPage = 7;
 
 export default function Home({ user, products, packedProducts }) {
-  console.log(user.redeemHistory);
   const { updatedUser, setUser } = useContext(UserContext);
   const [deviceButtons, setDeviceButtons] = useState(false);
   const [productsArrayIndex, setProductsArrayIndex] = useState(0);
@@ -44,14 +43,16 @@ export default function Home({ user, products, packedProducts }) {
       return;
     }
     if (
-      (changedVariable === 'lowestPrice' && !lowestPrice) ||
-      (changedVariable !== 'lowestPrice' && lowestPrice)
+      changedVariable !== 'highestPrice' &&
+      ((changedVariable === 'lowestPrice' && !lowestPrice) ||
+        (changedVariable !== 'lowestPrice' && lowestPrice))
     ) {
       filteredElements.sort((a, b) => a.cost > b.cost);
     }
     if (
-      (changedVariable === 'highestPrice' && !highestPrice) ||
-      (changedVariable !== 'highestPrice' && highestPrice)
+      changedVariable !== 'lowestPrice' &&
+      ((changedVariable === 'highestPrice' && !highestPrice) ||
+        (changedVariable !== 'highestPrice' && highestPrice))
     ) {
       filteredElements.sort((a, b) => a.cost < b.cost);
     }
