@@ -22,7 +22,7 @@
   border: 2px rgb(180, 0, 0) solid;
 }
 .username {
-  font-size: 2vw;
+  font-size: 3vw;
 }
 @media (max-width: 400px) {
   .aerolabLogo {
