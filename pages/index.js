@@ -34,7 +34,7 @@ export default function Home({ user, products, packedProducts }) {
   const pageIndexesString = `${pageIndexes[productsArrayIndex] + 1} to ${
     pageIndexes[productsArrayIndex + 1]
   } of ${pageIndexes[pageIndexes.length - 1]} products`;
-  function filter2() {
+  function filter() {
     let filteredElements = unredeemedProducts.map((p) => p);
     if (recent.current.checked) {
       setFilteredProducts(getFilteredRedeemedProducts());
@@ -91,7 +91,7 @@ export default function Home({ user, products, packedProducts }) {
             <span className={`${styles.productsAmount} smallFont`}>{pageIndexesString}</span>
             <div className={`${styles.buttons} rowContainer`}>
               <span>Sort by:</span>
-              <Button clickHandler={filter2} buttonRef={recent}>
+              <Button clickHandler={filter} buttonRef={recent}>
                 Most Recent
               </Button>
               <Button
@@ -99,7 +99,7 @@ export default function Home({ user, products, packedProducts }) {
                   setToggleLowest(() => toggleStyle);
                   toggleHighest();
                   if (highest) highest.current.checked = false;
-                  filter2();
+                  filter();
                 }}
                 buttonRef={lowest}
               >
@@ -110,18 +110,18 @@ export default function Home({ user, products, packedProducts }) {
                   setToggleHighest(() => toggleStyle);
                   toggleLowest();
                   if (lowest) lowest.current.checked = false;
-                  filter2();
+                  filter();
                 }}
                 buttonRef={highest}
               >
                 Highest price
               </Button>
               <select ref={category} name='' id=''>
-                <option value='' onClick={(e) => filter2(e.target.value)}>
+                <option value='' onClick={(e) => filter(e.target.value)}>
                   Category
                 </option>
                 {categories.map((c, index) => (
-                  <option key={index} onClick={(e) => filter2(e.target.value)}>
+                  <option key={index} onClick={(e) => filter(e.target.value)}>
                     {c}
                   </option>
                 ))}
@@ -136,7 +136,7 @@ export default function Home({ user, products, packedProducts }) {
                   style={{ alignItems: 'center' }}
                   className={`${styles.filterVariables} columnContainer`}
                 >
-                  <Button clickHandler={filter2} buttonRef={recent}>
+                  <Button clickHandler={filter} buttonRef={recent}>
                     Most Recent
                   </Button>
                   <Button
@@ -144,7 +144,7 @@ export default function Home({ user, products, packedProducts }) {
                       setToggleLowest(() => toggleStyle);
                       toggleHighest();
                       if (highest) highest.current.checked = false;
-                      filter2();
+                      filter();
                     }}
                     buttonRef={lowest}
                   >
@@ -155,18 +155,18 @@ export default function Home({ user, products, packedProducts }) {
                       setToggleHighest(() => toggleStyle);
                       toggleLowest();
                       if (lowest) lowest.current.checked = false;
-                      filter2();
+                      filter();
                     }}
                     buttonRef={highest}
                   >
                     Highest price
                   </Button>
-                  <select ref={category} name='' id=''>
-                    <option value='' onClick={(e) => filter2(e.target.value)}>
+                  <select ref={category} className={`marginSmall`} name='' id=''>
+                    <option value='' onClick={() => filter()}>
                       Category
                     </option>
                     {categories.map((c, index) => (
-                      <option key={index} onClick={(e) => filter2(e.target.value)}>
+                      <option key={index} onClick={() => filter()}>
                         {c}
                       </option>
                     ))}

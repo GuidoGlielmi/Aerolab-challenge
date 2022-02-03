@@ -5,10 +5,11 @@
   box-shadow: 0px -10px 30px 1px #42e0ff;
 }
 .headerTitle {
-  position: relative;
-  top: -130px;
-  left: 50px;
+  position: absolute;
+  top: 50%;
+  left: 10%;
   margin: 0px;
+  font-size: 7vw;
   line-height: 50px;
   font-family: SourceSansPro-Bold;
   font-weight: bold;

@@ -1,15 +1,33 @@
 .boxOn {
-	width: fit-content;
-	padding: 6px 15px;
-	border-radius: 20px;
-	color: rgb(245, 245, 245);
-	user-select: none;
+  width: fit-content;
+  padding: 6px 15px;
+  border-radius: 20px;
+  color: rgb(245, 245, 245);
+  user-select: none;
+  font-size: 2vw;
 }
 .boxOff {
-	width: fit-content;
-	padding: 6px 15px;
-	border-radius: 20px;
-	color: #727272;
-	background: #ddd;
-	user-select: none;
+  width: fit-content;
+  padding: 6px 15px;
+  border-radius: 20px;
+  color: #727272;
+  background: #ddd;
+  user-select: none;
+  font-size: 3vw;
+}
+@media (min-width: 1200px) {
+  .boxOn {
+    font-size: 1vw;
+  }
+  .boxOff {
+    font-size: 1vw;
+  }
+}
+@media (max-width: 500px) {
+  .boxOn {
+    padding: 3px 7px;
+  }
+  .boxOff {
+    padding: 3px 7px;
+  }
 }
