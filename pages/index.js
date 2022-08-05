@@ -1,72 +1,40 @@
 import Head from 'next/head';
-import { useState, useEffect, useContext, useRef } from 'react';
+import {useState, useMemo, useContext} from 'react';
 import styles from '../styles/Home.module.css';
 import Product from '../Components/Product';
 import ArrowNext from '../public/assets/icons/arrow-right.svg';
 import ArrowPrevious from '../public/assets/icons/arrow-left.svg';
-import { UserContext } from '../Components/Layout';
+import {UserContext} from '../Components/Layout';
 import Button from '../Components/ButtonPro';
 const productAmountPerPage = 7;
 
-export default function Home({ user, products, packedProducts }) {
-  const { updatedUser, setUser } = useContext(UserContext);
-  const lowest = useRef();
-  const highest = useRef();
-  const recent = useRef();
-  const category = useRef();
-  const [toggleLowest, setToggleLowest] = useState(() => () => '');
-  const [toggleHighest, setToggleHighest] = useState(() => () => '');
+export default function Home({products}) {
+  const {
+    user: {redeemHistory},
+  } = useContext(UserContext);
+
+  const [isRedeem, setIsRedeem] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState();
+  const [lowToHighOrder, setLowToHighOrder] = useState(true);
   const [deviceButtons, setDeviceButtons] = useState(false);
-  const [productsArrayIndex, setProductsArrayIndex] = useState(0);
-  const [unredeemedProducts, setUnredeemProducts] = useState(products);
-  const [filteredProducts, setFilteredProducts] = useState({
-    packed: packedProducts,
-    unpacked: products,
-  });
-  /* products is the complete list of products used as base array for
-  unredeemedProducts.
-  unredeemedProducts only gets updated when redeeming, and that's
-  the base array used for the filter.
-  filteredProducts is the unredeemedProducts filtered
-  */
-  const [categories, setCategories] = useState([]);
-  const pageIndexes = indexesCalculator(filteredProducts.unpacked);
-  const pageIndexesString = `${pageIndexes[productsArrayIndex] + 1} to ${
-    pageIndexes[productsArrayIndex + 1]
-  } of ${pageIndexes[pageIndexes.length - 1]} products`;
-  function filter() {
-    let filteredElements = unredeemedProducts.map((p) => p);
-    if (recent.current.checked) {
-      setFilteredProducts(getFilteredRedeemedProducts());
-      return;
-    }
-    if (lowest.current.checked) filteredElements.sort((a, b) => a.cost > b.cost);
-    if (highest.current.checked) filteredElements.sort((a, b) => a.cost < b.cost);
-    if (category.current.value) {
-      filteredElements = filteredElements.filter((fe) => fe.category === category.current.value);
-    }
-    setFilteredProducts({ packed: packer(filteredElements), unpacked: filteredElements });
-  }
-  function getFilteredRedeemedProducts() {
-    let filteredElements = updatedUser.redeemHistory.map((rh) => rh);
-    if (lowest.current.checked) filteredElements.sort((a, b) => a.cost > b.cost);
-    if (highest.current.checked) filteredElements.sort((a, b) => a.cost < b.cost);
-    if (category.current.value) {
-      filteredElements = filteredElements.filter((fe) => fe.category === category.current.value);
-    }
-    return { packed: packer(filteredElements), unpacked: filteredElements };
-  }
-  function redeemProduct(id) {
-    const unpacked = filteredProducts.filter(({ _id }) => _id !== id);
-    const unpackedUnredeemed = unredeemedProducts.filter(({ _id }) => _id !== id);
-    setUnredeemProducts(unpackedUnredeemed);
-    setFilteredProducts({ packed: packer(unpacked), unpacked });
-  }
-  useEffect(() => {
-    setUser(user);
-    const categories = getUniqueElements(products, 'category').uniqueElements;
-    setCategories(categories.sort((a, b) => a > b));
-  }, []);
+  const categories = useMemo(
+    () => [...new Set(products.map(({category}) => category))],
+    [products],
+  );
+
+  const [packedFilteredProducts, pageIndexes, productsAmount] = useMemo(() => {
+    const selectedProducts = isRedeem ? redeemHistory : products;
+    const filteredProducts = (
+      !selectedCategory
+        ? selectedProducts
+        : selectedProducts.filter(({category}) => category === selectedCategory)
+    ).sort((a, b) => (lowToHighOrder ? a.cost > b.cost : a.cost < b.cost));
+    return [...packer(filteredProducts), filteredProducts.length];
+  }, [selectedCategory, lowToHighOrder, isRedeem, redeemHistory, products]);
+
+  const [pageNumber, setPageNumber] = useState(0);
+
+  const pageIndexesString = `${pageIndexes[pageNumber][0]} to ${pageIndexes[pageNumber][1]} of ${productsAmount} products`;
 
   return (
     <div className={styles.container}>
@@ -91,84 +59,36 @@ export default function Home({ user, products, packedProducts }) {
             <span className={`${styles.productsAmount} smallFont`}>{pageIndexesString}</span>
             <div className={`${styles.buttons} rowContainer`}>
               <span>Sort by:</span>
-              <Button clickHandler={filter} buttonRef={recent}>
-                Most Recent
-              </Button>
-              <Button
-                clickHandler={(_, toggleStyle) => {
-                  setToggleLowest(() => toggleStyle);
-                  toggleHighest();
-                  if (highest) highest.current.checked = false;
-                  filter();
-                }}
-                buttonRef={lowest}
-              >
-                Lowest price
-              </Button>
-              <Button
-                clickHandler={(_, toggleStyle) => {
-                  setToggleHighest(() => toggleStyle);
-                  toggleLowest();
-                  if (lowest) lowest.current.checked = false;
-                  filter();
-                }}
-                buttonRef={highest}
-              >
-                Highest price
-              </Button>
-              <select ref={category} name='' id=''>
-                <option value='' onClick={(e) => filter(e.target.value)}>
-                  Category
-                </option>
+              <Button action={() => setIsRedeem(pr => !pr)}>Most Recent</Button>
+              <Button action={() => setLowToHighOrder(true)}>Lowest price</Button>
+              <Button action={() => setLowToHighOrder(false)}>Highest price</Button>
+              <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+                <option value=''>Category</option>
                 {categories.map((c, index) => (
-                  <option key={index} onClick={(e) => filter(e.target.value)}>
-                    {c}
-                  </option>
+                  <option key={index}>{c}</option>
                 ))}
               </select>
             </div>
             <div className={`${styles.deviceButtons} columnContainer`}>
               <div className='marginMedium'>
-                <Button clickHandler={() => setDeviceButtons(!deviceButtons)}>Sort By</Button>
+                <Button action={() => setDeviceButtons(ps => !ps)}>Sort By</Button>
               </div>
               {deviceButtons && (
                 <div
-                  style={{ alignItems: 'center' }}
+                  style={{alignItems: 'center'}}
                   className={`${styles.filterVariables} columnContainer`}
                 >
-                  <Button clickHandler={filter} buttonRef={recent}>
-                    Most Recent
-                  </Button>
-                  <Button
-                    clickHandler={(_, toggleStyle) => {
-                      setToggleLowest(() => toggleStyle);
-                      toggleHighest();
-                      if (highest) highest.current.checked = false;
-                      filter();
-                    }}
-                    buttonRef={lowest}
+                  <Button clickHandler={filter}>Most Recent</Button>
+                  <Button action={() => setLowToHighOrder(true)}>Lowest price</Button>
+                  <Button action={() => setLowToHighOrder(false)}>Highest price</Button>
+                  <select
+                    className={`marginSmall`}
+                    value={selectedCategory}
+                    onChange={e => setSelectedCategory(e.target.value)}
                   >
-                    Lowest price
-                  </Button>
-                  <Button
-                    clickHandler={(_, toggleStyle) => {
-                      setToggleHighest(() => toggleStyle);
-                      toggleLowest();
-                      if (lowest) lowest.current.checked = false;
-                      filter();
-                    }}
-                    buttonRef={highest}
-                  >
-                    Highest price
-                  </Button>
-                  <select ref={category} className={`marginSmall`} name='' id=''>
-                    <option value='' onClick={() => filter()}>
-                      Category
-                    </option>
+                    <option value=''>Category</option>
                     {categories.map((c, index) => (
-                      <option key={index} onClick={() => filter()}>
-                        {c}
-                      </option>
+                      <option key={index}>{c}</option>
                     ))}
                   </select>
                 </div>
@@ -176,30 +96,30 @@ export default function Home({ user, products, packedProducts }) {
             </div>
           </div>
           <div className='rowContainer'>
-            {productsArrayIndex > 0 && (
+            {/*   {!pageNumber && (
+              <>
+                <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(0)} />
+              </>
+            )} */}
+            {!!pageNumber && (
+              <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(pn => pn - 1)} />
+            )}
+            {pageNumber < packedFilteredProducts.length - 1 && (
+              <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
+            )}
+            {/*    {pageNumber !== packedFilteredProducts.length - 1 && (
               <ArrowPrevious
                 className={styles.arrow}
-                onClick={() => setProductsArrayIndex(productsArrayIndex - 1)}
+                onClick={() => setPageNumber(packedFilteredProducts.length - 1)}
               />
-            )}
-            {productsArrayIndex < filteredProducts.packed.length - 1 && (
-              <ArrowNext
-                className={styles.arrow}
-                onClick={() => setProductsArrayIndex(productsArrayIndex + 1)}
-              />
-            )}
+            )} */}
           </div>
         </div>
         <section className={`${styles.section} columnContainer`}>
-          <div style={{ position: 'relative' }} className={`wrapBox`}>
-            {filteredProducts.packed[0] ? (
-              filteredProducts.packed[productsArrayIndex].map((p, index) => (
-                <Product
-                  key={index}
-                  product={p}
-                  availablePoints={updatedUser.points}
-                  redeemProduct={redeemProduct}
-                />
+          <div style={{position: 'relative'}} className={`wrapBox`}>
+            {packedFilteredProducts[0].length ? (
+              packedFilteredProducts[pageNumber].map((p, i) => (
+                <Product key={isRedeem ? i : p._id} product={p} />
               ))
             ) : (
               <div className='marginMedium'>No products available</div>
@@ -208,17 +128,14 @@ export default function Home({ user, products, packedProducts }) {
           <div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
             <span>{pageIndexesString}</span>
             <div>
-              {productsArrayIndex > 0 && (
+              {!!pageNumber && (
                 <ArrowPrevious
                   className={styles.arrow}
-                  onClick={() => setProductsArrayIndex(productsArrayIndex - 1)}
+                  onClick={() => setPageNumber(pn => pn - 1)}
                 />
               )}
-              {productsArrayIndex < filteredProducts.packed.length - 1 && (
-                <ArrowNext
-                  className={styles.arrow}
-                  onClick={() => setProductsArrayIndex(productsArrayIndex + 1)}
-                />
+              {pageNumber < packedFilteredProducts.length - 1 && (
+                <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
               )}
             </div>
           </div>
@@ -236,24 +153,7 @@ export default function Home({ user, products, packedProducts }) {
     </div>
   );
 }
-export function getUniqueElements(array, variable) {
-  const uniqueElements = [];
-  let willAddElement = true;
-  for (let index = 0; index < array.length; index++) {
-    for (let index2 = 0; index2 < uniqueElements.length; index2++) {
-      if (array[index][variable] === uniqueElements[index2]) {
-        willAddElement = false;
-        break;
-      }
-    }
-    if (willAddElement) uniqueElements.push(array[index][variable]);
-    willAddElement = true;
-  }
-  const repetitionAmounts = uniqueElements.map(
-    (ue) => array.filter((element) => element[variable] === ue).length,
-  );
-  return { uniqueElements, repetitionAmounts };
-}
+
 export async function getRequest(url) {
   const responseRaw = await fetch(url, {
     headers: {
@@ -270,19 +170,16 @@ export async function getRequest(url) {
       status: `${responseRaw.status} ${responseRaw.statusText}`,
     });
   }
-  const responseJson = await responseRaw.json();
-  return responseJson;
+  return responseRaw.json();
 }
 export async function getStaticProps() {
   try {
-    const user = await getRequest('https://coding-challenge-api.aerolab.co/user/me');
+    // const user = await getRequest('https://coding-challenge-api.aerolab.co/user/me');
     const products = await getRequest('https://coding-challenge-api.aerolab.co/products');
-    const packedProducts = packer(products);
     return {
       props: {
-        user,
+        // user,
         products,
-        packedProducts,
       },
       revalidate: 1,
     };
@@ -290,32 +187,26 @@ export async function getStaticProps() {
     console.log(e);
   }
 }
-export function packer(array) {
-  const entireArray = [];
-  let pack = [];
-  for (let index = 0; index < array.length; index++) {
-    if (array.length - (index + 1) < array.length % productAmountPerPage) {
-      pack.push(array[index]);
-      if (array.length - index === 1) entireArray.push(pack);
-    } else if (index !== 0 && (index + 1) % productAmountPerPage === 0) {
-      pack.push(array[index]);
-      entireArray.push(pack);
-      pack = [];
-    } else pack.push(array[index]);
-  }
-  return entireArray;
-}
-export function indexesCalculator(array) {
-  const divisionNumbers = [0];
-  for (let index = 0; index < array.length; index++) {
-    if (index !== 0 && (index + 1) % productAmountPerPage === 0) {
-      divisionNumbers.push(index + 1);
+
+function packer(arr) {
+  const newArr = [...arr];
+  const pack = [];
+  const indexNumbers = [];
+  while (newArr.length) {
+    const newElements = newArr.splice(0, productAmountPerPage);
+    pack.push(newElements);
+    if (newElements.length === 1) {
+      indexNumbers.push([arr.length]);
+      break;
     }
+    const lastNumber = indexNumbers[indexNumbers.length - 1]?.[1] || 0;
+    indexNumbers.push([lastNumber + 1, lastNumber + newElements.length]);
   }
-  divisionNumbers.push(array.length);
-  return divisionNumbers;
+  return [pack, indexNumbers];
 }
-/* {
+
+/* 
+{
   _id: '61f6d73aa132840021f058d2',
   name: 'John Kite',
   points: 24200,
@@ -323,9 +214,18 @@ export function indexesCalculator(array) {
   redeemHistory: [],
   __v: 0
 } 
-packer(
-  filteredProducts.unpacked.filter((up) => {
-    !updatedUser.redeemHistory.map(({ _id }) => _id).includes(up._id);
-  }),
-);
+
+[
+  {
+    "img": {
+        "url": "https://coding-challenge-api.aerolab.co/images/iPhone8-x1.png",
+        "hdUrl": "https://coding-challenge-api.aerolab.co/images/iPhone8-x2.png"
+    },
+    "_id": "5a0b35c1734d1d08bf7084c3",
+    "name": "iPhone 8",
+    "cost": 800,
+    "category": "Phones"
+  },
+  ...
+]
 */

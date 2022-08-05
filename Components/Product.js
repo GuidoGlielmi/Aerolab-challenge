@@ -1,77 +1,64 @@
-import { useState, useContext } from 'react';
+import {useState, useContext} from 'react';
 import BuyBlue from '../public/assets/icons/buy-blue.svg';
 import BuyWhite from '../public/assets/icons/buy-white.svg';
 import Coin from '../public/assets/icons/coin.svg';
-import Button from './Button';
+import Button from './ButtonPro';
 import styles from './product.module.css';
-import { postRequest } from './Layout';
-import { UserContext } from './Layout';
-import { getRequest } from '../pages/index';
+import {UserContext} from './Layout';
 const Product = ({
-	product: {
-		name,
-		_id,
-		cost,
-		category,
-		img: { url },
-	},
-	availablePoints,
-	redeemProduct,
+  product: {
+    name,
+    _id,
+    cost,
+    category,
+    img: {url},
+  },
 }) => {
-	const { updatedUser, setUser } = useContext(UserContext);
-	const [clicked, setClicked] = useState(false);
-	async function redeem(e) {
-		e.stopPropagation();
-		try {
-			await postRequest(_id, 'productId', 'https://coding-challenge-api.aerolab.co/redeem');
-			const user = await getRequest('https://coding-challenge-api.aerolab.co/user/me');
-			setUser(user);
-			redeemProduct(_id);
-		} catch (err) {
-			console.log(err);
-		}
-	}
-	return (
-		<div className={styles.products}>
-			<div
-				className={clicked ? styles.clickedBox : styles.box}
-				onMouseEnter={() => setClicked(true)}
-				onMouseLeave={() => setClicked(false)}
-				onClick={() => setClicked(!clicked)}
-			>
-				<div className={styles.buyIcon}>
-					{cost > availablePoints ? (
-						<Button>
-							<span>{`You need ${cost - availablePoints}`}</span>
-							<Coin />
-						</Button>
-					) : clicked ? (
-						<BuyWhite />
-					) : (
-						<BuyBlue />
-					)}
-				</div>
-				<img src={url} alt='' className={clicked ? 'reducedOpacity' : ''} />
-				<div className={`${clicked ? styles.boxInfo : 'hidden'} columnContainer`}>
-					<div className='rowContainer'>
-						<Coin />
-						<span className='smallFont'>{cost}</span>
-					</div>
-					{cost < availablePoints ? (
-						<Button size='xSmall' cursor='pointer' clickHandler={(e) => redeem(e)}>
-							Redeem Now
-						</Button>
-					) : (
-						<></>
-					)}
-				</div>
-				<div className={`${styles.info} ${clicked ? 'reducedOpacity' : ''}`}>
-					<h3 className={`${styles.category} xSmallFont`}>{category}</h3>
-					<h2 className={`${styles.title} smallFont`}>{name}</h2>
-				</div>
-			</div>
-		</div>
-	);
+  const {
+    user: {points: availablePoints},
+    redeem,
+  } = useContext(UserContext);
+  const [clicked, setClicked] = useState(false);
+
+  return (
+    <div className={styles.products}>
+      <div
+        className={clicked ? styles.clickedBox : styles.box}
+        onMouseEnter={() => setClicked(true)}
+        onMouseLeave={() => setClicked(false)}
+        onClick={() => setClicked(pc => !pc)}
+      >
+        <div className={styles.buyIcon}>
+          {cost > availablePoints ? (
+            <Button>
+              <span>{`You need ${cost - availablePoints}`}</span>
+              <Coin />
+            </Button>
+          ) : clicked ? (
+            <BuyWhite />
+          ) : (
+            <BuyBlue />
+          )}
+        </div>
+        <img src={url} alt={name} className={clicked ? 'reducedOpacity' : ''} />
+        <div className={`${clicked ? styles.boxInfo : 'hidden'} columnContainer`}>
+          <div className='rowContainer'>
+            <Coin />
+            <span className='smallFont'>{cost}</span>
+          </div>
+          {cost < availablePoints && (
+            <Button size='xSmall' cursor='pointer' action={() => redeem(_id)}>
+              Redeem Now
+            </Button>
+          )}
+        </div>
+        <div className={`${styles.info} ${clicked ? 'reducedOpacity' : ''}`}>
+          <h3 className={`${styles.category} xSmallFont`}>{category}</h3>
+          <h2 className={`${styles.title} smallFont`}>{name}</h2>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 /* {
