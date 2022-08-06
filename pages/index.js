@@ -49,6 +49,7 @@ export default function Home({products}) {
       <main className={styles.main}>
         <Header />
         <SelectionBox
+          isRedeem={isRedeem}
           setIsRedeem={setIsRedeem}
           lowToHighOrder={lowToHighOrder}
           setLowToHighOrder={setLowToHighOrder}
@@ -94,6 +95,7 @@ const Header = () => (
 );
 
 const SelectionBox = ({
+  isRedeem,
   setIsRedeem,
   lowToHighOrder,
   setLowToHighOrder,
@@ -109,57 +111,53 @@ const SelectionBox = ({
   productsAmount,
 }) => (
   <div className={styles.filter}>
-    <div>
-      <span className={`${styles.productsAmount} smallFont`}>{pageNumbersString}</span>
-      <div className={styles.filterButtonsBox}>
-        <span>Sort by:</span>
-        <Button action={() => setIsRedeem(pr => !pr)}>Most Recent</Button>
-        {orders.map(o => (
-          <Button key={o} state={lowToHighOrder === o} action={() => setLowToHighOrder(o)}>
-            {o}
-          </Button>
+    <span className={styles.productsAmount}>{pageNumbersString}</span>
+    <div className={styles.filterButtonsBox}>
+      <span>Sort by:</span>
+      <Button state={isRedeem} action={() => setIsRedeem(pr => !pr)}>
+        Most Recent
+      </Button>
+      {orders.map(o => (
+        <Button key={o} state={lowToHighOrder === o} action={() => setLowToHighOrder(o)}>
+          {o}
+        </Button>
+      ))}
+      <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+        <option value=''>Category</option>
+        {categories.map((c, index) => (
+          <option key={index}>{c}</option>
         ))}
-        <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-          <option value=''>Category</option>
-          {categories.map((c, index) => (
-            <option key={index}>{c}</option>
-          ))}
-        </select>
-      </div>
-      <div className={`${styles.deviceButtons} columnContainer`}>
-        <div className='marginMedium'>
-          <Button action={() => setDeviceButtons(ps => !ps)}>Sort By</Button>
-        </div>
-        {deviceButtons && (
-          <div
-            style={{alignItems: 'center'}}
-            className={`${styles.filterVariables} columnContainer`}
-          >
-            <Button action={() => setIsRedeem(ps => !ps)}>Most Recent</Button>
-            <Button action={() => setLowToHighOrder(true)}>Lowest price</Button>
-            <Button action={() => setLowToHighOrder(false)}>Highest price</Button>
-            <select
-              className={`marginSmall`}
-              value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
-            >
-              <option value=''>Category</option>
-              {categories.map((c, index) => (
-                <option key={index}>{c}</option>
-              ))}
-            </select>
-          </div>
-        )}
-      </div>
+      </select>
     </div>
     {productsAmount && (
       <Arrows pageNumber={pageNumber} setPageNumber={setPageNumber} lastPage={lastPage} />
     )}
+    <div className={styles.deviceButtons}>
+      <Button action={() => setDeviceButtons(ps => !ps)}>Sort By</Button>
+      {deviceButtons && (
+        <div className={styles.filterButtons}>
+          <Button state={isRedeem} action={() => setIsRedeem(pr => !pr)}>
+            Most Recent
+          </Button>
+          {orders.map(o => (
+            <Button key={o} state={lowToHighOrder === o} action={() => setLowToHighOrder(o)}>
+              {o}
+            </Button>
+          ))}
+          <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+            <option value=''>Category</option>
+            {categories.map((c, index) => (
+              <option key={index}>{c}</option>
+            ))}
+          </select>
+        </div>
+      )}
+    </div>
   </div>
 );
 
 const Arrows = ({pageNumber, setPageNumber, lastPage}) => (
-  <div>
+  <div className={styles.arrows}>
     {!!pageNumber && (
       <div
         style={{filter: 'drop-shadow(0 0 1px blue)'}}
@@ -188,16 +186,14 @@ const Arrows = ({pageNumber, setPageNumber, lastPage}) => (
 );
 
 const NavigationFooter = ({pageNumber, setPageNumber, pageNumbersString, lastPage}) => (
-  <div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
+  <div className={styles.productsAmountFooter}>
+    {!!pageNumber && (
+      <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(pn => pn - 1)} />
+    )}
     <span>{pageNumbersString}</span>
-    <div>
-      {!!pageNumber && (
-        <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(pn => pn - 1)} />
-      )}
-      {pageNumber < lastPage && (
-        <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
-      )}
-    </div>
+    {pageNumber < lastPage && (
+      <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
+    )}
   </div>
 );
 

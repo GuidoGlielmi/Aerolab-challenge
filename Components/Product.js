@@ -18,14 +18,13 @@ const Product = ({
     user: {points: availablePoints},
     redeem,
   } = useContext(UserContext);
-  const [clicked, setClicked] = useState(true);
+  const [clicked, setClicked] = useState(false);
   return (
     <div
       id='product'
       className={styles.box}
-      onMouseOver={() => setClicked(true)}
+      onMouseEnter={() => setClicked(true)}
       onMouseLeave={() => setClicked(false)}
-      onClick={() => setClicked(pc => !pc)}
     >
       {clicked && (
         <Clicked
@@ -36,15 +35,14 @@ const Product = ({
           redeem={redeem}
         />
       )}
-      {!clicked &&
-        (cost > availablePoints ? (
-          <Button>
-            <span>{`You need ${cost - availablePoints}`}</span>
-            <Coin />
-          </Button>
-        ) : (
-          <BuyBlue className={styles.buyIcon} />
-        ))}
+      {cost > availablePoints ? (
+        <Button>
+          <span>{`You need ${cost - availablePoints}`}</span>
+          <Coin />
+        </Button>
+      ) : (
+        <BuyBlue className={styles.buyIcon} />
+      )}
       <img src={url} alt={name} />
       <div className={styles.info}>
         <h3>{category}</h3>
@@ -55,17 +53,13 @@ const Product = ({
 };
 const Clicked = ({cost, availablePoints, redeem, id}) => (
   <div className={styles.contentWhenClicked}>
-    <BuyWhite className={styles.buyIcon} />
+    {cost < availablePoints && <BuyWhite className={styles.buyIcon} />}
     <div className={styles.contentWhenClickedInfo}>
       <div>
         <Coin />
         <span>{cost}</span>
       </div>
-      {cost < availablePoints && (
-        <Button size='xSmall' action={() => redeem(id)}>
-          Redeem Now
-        </Button>
-      )}
+      {cost < availablePoints && <Button action={() => redeem(id)}>Redeem Now</Button>}
     </div>
   </div>
 );

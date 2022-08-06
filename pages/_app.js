@@ -1,16 +1,12 @@
 import '../styles/globals.css';
 import Layout from '../Components/Layout';
-import React, { useState } from 'react';
-export const Modal = React.createContext();
 
-function MyApp({ Component, pageProps }) {
-	return (
-		<Modal.Provider value={123}>
-			<Layout>
-				<Component {...pageProps} />
-			</Layout>
-		</Modal.Provider>
-	);
+function MyApp({Component, pageProps}) {
+  return (
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
+  );
 }
 
 export default MyApp;
