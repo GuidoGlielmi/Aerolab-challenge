@@ -1,11 +1,11 @@
-import {useMemo, createContext, useEffect, useCallback} from 'react';
-import styles from './layout.module.css';
+import {useMemo, createContext, useEffect, useCallback, useState, useRef} from 'react';
 import AerolabLogo from '../public/assets/aerolab-logo.svg';
 import Coin from '../public/assets/icons/coin.svg';
-import Button from '../Components/ButtonPro';
+import Button from './Button';
 import Modal from '../Components/Modal';
-import {useState, useRef} from 'react';
 import {getRequest} from '../pages';
+import styles from './layout.module.css';
+
 export const UserContext = createContext();
 
 const Layout = ({children}) => {
@@ -21,6 +21,7 @@ const Layout = ({children}) => {
   const [invalidInput, setInvalidInput] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const pointsAmount = useRef(0);
+
   async function getPoints() {
     if (
       pointsAmount.current.value !== '1000' &&
@@ -34,7 +35,7 @@ const Layout = ({children}) => {
         'https://coding-challenge-api.aerolab.co/user/points',
         {amount: +pointsAmount.current.value},
       );
-      setUser({...user, points: newPoints});
+      setUser(pu => ({...pu, points: newPoints}));
       setShowModal(false);
       setInvalidInput(false);
     } catch (error) {
@@ -74,29 +75,29 @@ const Layout = ({children}) => {
           }}
         />
       )}
-      <nav className={`rowContainer ${styles.nav}`}>
-        <div>
-          <AerolabLogo className={styles.aerolabLogo} />
-        </div>
-        <div className={`${styles.username} rowContainer`}>
-          <span>{user.name}</span>
-          <div className='marginSmall'>
-            <Button cursor='default'>
-              <span>{user.points}</span>
-              <Coin className={styles.coin} />
-            </Button>
-          </div>
-          <div className='marginSmall'>
-            <Button clickHandler={() => setShowModal(true)} cursor='pointer'>
-              Get Points
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <NavBar user={user} showModal={showModal} setShowModal={setShowModal} />
       {children}
     </UserContext.Provider>
   );
 };
+
+const NavBar = ({user, showModal, setShowModal}) => (
+  <nav className={styles.nav}>
+    <div>
+      <AerolabLogo className={styles.aerolabLogo} />
+      <span>{user.name}</span>
+    </div>
+    <div>
+      <Button>
+        <span>{user.points}</span>
+        <Coin />
+      </Button>
+      <Button state={showModal} action={() => setShowModal(true)}>
+        Get Points
+      </Button>
+    </div>
+  </nav>
+);
 
 export default Layout;
 

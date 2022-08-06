@@ -1,42 +1,31 @@
 .nav {
+  display: flex;
   position: sticky;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   top: 0;
-  justify-content: space-between;
-  height: fit-content;
-  padding: 10px;
+  padding: 2vh 2vw;
   z-index: 1;
   background: rgba(245, 245, 245, 1);
   box-shadow: 0px 0px 2px 0.1px rgba(15, 15, 15, 1);
+  font-size: var(--global-font-large);
+}
+.nav > div {
+  display: flex;
+  gap: 20px;
+}
+.nav > div:first-child {
+  align-items: center;
 }
 
 .aerolabLogo {
-  height: 100%;
-  margin: 5px 5px 5px 3vw;
-}
-.coinBox {
-  padding: 5px;
-  margin: 0 10px;
-  background: #aaa;
+  max-height: 100%;
 }
 
-.username {
-  font-size: 3vw;
-}
-@media (max-width: 400px) {
-  .aerolabLogo {
-    transform: scale(0.8);
-  }
-  .coin {
-    transform: scale(0.7);
-    line-height: 5px;
-  }
-}
-@media (min-width: 1200px) {
-  .aerolabLogo {
-    transform: scale(1.5);
-  }
-
-  .username {
-    font-size: 1.5vw;
+@media (min-width: 768px) {
+  .nav {
+    flex-direction: row;
+    justify-content: space-between;
   }
 }

@@ -2,7 +2,7 @@ import {useState, useContext} from 'react';
 import BuyBlue from '../public/assets/icons/buy-blue.svg';
 import BuyWhite from '../public/assets/icons/buy-white.svg';
 import Coin from '../public/assets/icons/coin.svg';
-import Button from './ButtonPro';
+import Button from './Button';
 import styles from './product.module.css';
 import {UserContext} from './Layout';
 const Product = ({
@@ -18,49 +18,57 @@ const Product = ({
     user: {points: availablePoints},
     redeem,
   } = useContext(UserContext);
-  const [clicked, setClicked] = useState(false);
-
+  const [clicked, setClicked] = useState(true);
   return (
-    <div className={styles.products}>
-      <div
-        className={clicked ? styles.clickedBox : styles.box}
-        onMouseEnter={() => setClicked(true)}
-        onMouseLeave={() => setClicked(false)}
-        onClick={() => setClicked(pc => !pc)}
-      >
-        <div className={styles.buyIcon}>
-          {cost > availablePoints ? (
-            <Button>
-              <span>{`You need ${cost - availablePoints}`}</span>
-              <Coin />
-            </Button>
-          ) : clicked ? (
-            <BuyWhite />
-          ) : (
-            <BuyBlue />
-          )}
-        </div>
-        <img src={url} alt={name} className={clicked ? 'reducedOpacity' : ''} />
-        <div className={`${clicked ? styles.boxInfo : 'hidden'} columnContainer`}>
-          <div className='rowContainer'>
+    <div
+      id='product'
+      className={styles.box}
+      onMouseOver={() => setClicked(true)}
+      onMouseLeave={() => setClicked(false)}
+      onClick={() => setClicked(pc => !pc)}
+    >
+      {clicked && (
+        <Clicked
+          id={_id}
+          cost={cost}
+          availablePoints={availablePoints}
+          clicked={clicked}
+          redeem={redeem}
+        />
+      )}
+      {!clicked &&
+        (cost > availablePoints ? (
+          <Button>
+            <span>{`You need ${cost - availablePoints}`}</span>
             <Coin />
-            <span className='smallFont'>{cost}</span>
-          </div>
-          {cost < availablePoints && (
-            <Button size='xSmall' cursor='pointer' action={() => redeem(_id)}>
-              Redeem Now
-            </Button>
-          )}
-        </div>
-        <div className={`${styles.info} ${clicked ? 'reducedOpacity' : ''}`}>
-          <h3 className={`${styles.category} xSmallFont`}>{category}</h3>
-          <h2 className={`${styles.title} smallFont`}>{name}</h2>
-        </div>
+          </Button>
+        ) : (
+          <BuyBlue className={styles.buyIcon} />
+        ))}
+      <img src={url} alt={name} />
+      <div className={styles.info}>
+        <h3>{category}</h3>
+        <h2>{name}</h2>
       </div>
     </div>
   );
 };
-
+const Clicked = ({cost, availablePoints, redeem, id}) => (
+  <div className={styles.contentWhenClicked}>
+    <BuyWhite className={styles.buyIcon} />
+    <div className={styles.contentWhenClickedInfo}>
+      <div>
+        <Coin />
+        <span>{cost}</span>
+      </div>
+      {cost < availablePoints && (
+        <Button size='xSmall' action={() => redeem(id)}>
+          Redeem Now
+        </Button>
+      )}
+    </div>
+  </div>
+);
 /* {
     img: {
       url: 'https://coding-challenge-api.aerolab.co/images/MotoG5-x1.png',

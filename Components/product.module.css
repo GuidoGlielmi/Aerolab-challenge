@@ -1,63 +1,59 @@
-.products {
-	box-sizing: content-box;
-	position: relative;
-	width: max-content;
-	margin: 10px;
+.box,
+.contentWhenClicked {
+  padding: 30px 5px;
 }
+
 .box {
-	position: relative;
-	top: 0;
-	left: 0;
-	z-index: 0;
-	width: max-content;
-	padding: 30px 5px;
-	background: white;
-	box-shadow: 2px 2px 5px 0.1px rgba(150, 150, 150, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+  width: min-content;
+  background: white;
+  box-shadow: 2px 2px 5px 0.1px rgba(150, 150, 150, 1);
+  font-size: var(--global-font-medium);
 }
-.clickedBox {
-	position: relative;
-	top: 0;
-	left: 0;
-	z-index: 0;
-	width: max-content;
-	padding: 30px 5px;
-	box-shadow: 2px 2px 5px 0.1px rgba(150, 150, 150, 1);
-	background-image: linear-gradient(-180deg, #0ad4fa 0%, #25bbf1 100%);
-	opacity: 0.8;
+.box * {
+  pointer-events: none;
 }
-.boxInfo {
-	align-items: center;
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
-}
+
 .info {
-	margin: 15px;
-	padding: 5px 0;
-	border-top: 1px rgb(200, 200, 200) solid;
+  align-self: stretch;
+  margin: 15px;
+  padding: 5px 0;
+  border-top: 1px rgb(200, 200, 200) solid;
+  font-size: 1.5em;
 }
+
 .buyIcon {
-	position: absolute;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-end;
-	padding: 10px;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	z-index: 1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(-20%) translateY(20%);
+  z-index: 1;
 }
-.category,
-.title {
-	margin: 0px;
+
+.contentWhenClicked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(-170deg, rgba(37, 214, 250, 0.7), rgba(148, 27, 196, 0.7));
+
+  text-shadow: 1px 1px 1px white;
 }
-.redeem {
-	position: absolute;
-	align-items: center;
-	z-index: 1;
+.contentWhenClickedInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+.contentWhenClickedInfo > div:first-child {
+  display: flex;
+  align-items: center;
 }

@@ -5,8 +5,10 @@ import Product from '../Components/Product';
 import ArrowNext from '../public/assets/icons/arrow-right.svg';
 import ArrowPrevious from '../public/assets/icons/arrow-left.svg';
 import {UserContext} from '../Components/Layout';
-import Button from '../Components/ButtonPro';
+import Button from '../Components/Button';
 const productAmountPerPage = 7;
+
+const orders = ['Lowest Price', 'Highest Price'];
 
 export default function Home({products}) {
   const {
@@ -15,7 +17,7 @@ export default function Home({products}) {
 
   const [isRedeem, setIsRedeem] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState();
-  const [lowToHighOrder, setLowToHighOrder] = useState(true);
+  const [lowToHighOrder, setLowToHighOrder] = useState(orders[0]);
   const [deviceButtons, setDeviceButtons] = useState(false);
   const categories = useMemo(
     () => [...new Set(products.map(({category}) => category))],
@@ -28,13 +30,13 @@ export default function Home({products}) {
       !selectedCategory
         ? selectedProducts
         : selectedProducts.filter(({category}) => category === selectedCategory)
-    ).sort((a, b) => (lowToHighOrder ? a.cost > b.cost : a.cost < b.cost));
+    ).sort((a, b) => (lowToHighOrder === orders[0] ? a.cost > b.cost : a.cost < b.cost));
     return [...packer(filteredProducts), filteredProducts.length];
   }, [selectedCategory, lowToHighOrder, isRedeem, redeemHistory, products]);
 
   const [pageNumber, setPageNumber] = useState(0);
 
-  const pageIndexesString = `${pageIndexes[pageNumber][0]} to ${pageIndexes[pageNumber][1]} of ${productsAmount} products`;
+  const pageNumbersString = `${pageIndexes[pageNumber][0]} to ${pageIndexes[pageNumber][1]} of ${productsAmount} products`;
 
   return (
     <div className={styles.container}>
@@ -45,114 +47,167 @@ export default function Home({products}) {
       </Head>
 
       <main className={styles.main}>
-        <header className={styles.header}>
-          <img
-            src='/assets/header-x1.png'
-            width='100%'
-            alt='header image'
-            className={styles.headerImage}
-          />
-          <h1 className={`${styles.headerTitle} bigFont`}>Electronics</h1>
-        </header>
-        <div className={styles.filter}>
-          <div className={styles.filterBox}>
-            <span className={`${styles.productsAmount} smallFont`}>{pageIndexesString}</span>
-            <div className={`${styles.buttons} rowContainer`}>
-              <span>Sort by:</span>
-              <Button action={() => setIsRedeem(pr => !pr)}>Most Recent</Button>
-              <Button action={() => setLowToHighOrder(true)}>Lowest price</Button>
-              <Button action={() => setLowToHighOrder(false)}>Highest price</Button>
-              <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-                <option value=''>Category</option>
-                {categories.map((c, index) => (
-                  <option key={index}>{c}</option>
-                ))}
-              </select>
-            </div>
-            <div className={`${styles.deviceButtons} columnContainer`}>
-              <div className='marginMedium'>
-                <Button action={() => setDeviceButtons(ps => !ps)}>Sort By</Button>
-              </div>
-              {deviceButtons && (
-                <div
-                  style={{alignItems: 'center'}}
-                  className={`${styles.filterVariables} columnContainer`}
-                >
-                  <Button clickHandler={filter}>Most Recent</Button>
-                  <Button action={() => setLowToHighOrder(true)}>Lowest price</Button>
-                  <Button action={() => setLowToHighOrder(false)}>Highest price</Button>
-                  <select
-                    className={`marginSmall`}
-                    value={selectedCategory}
-                    onChange={e => setSelectedCategory(e.target.value)}
-                  >
-                    <option value=''>Category</option>
-                    {categories.map((c, index) => (
-                      <option key={index}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className='rowContainer'>
-            {/*   {!pageNumber && (
-              <>
-                <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(0)} />
-              </>
-            )} */}
-            {!!pageNumber && (
-              <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(pn => pn - 1)} />
-            )}
-            {pageNumber < packedFilteredProducts.length - 1 && (
-              <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
-            )}
-            {/*    {pageNumber !== packedFilteredProducts.length - 1 && (
-              <ArrowPrevious
-                className={styles.arrow}
-                onClick={() => setPageNumber(packedFilteredProducts.length - 1)}
-              />
-            )} */}
-          </div>
-        </div>
-        <section className={`${styles.section} columnContainer`}>
-          <div style={{position: 'relative'}} className={`wrapBox`}>
-            {packedFilteredProducts[0].length ? (
-              packedFilteredProducts[pageNumber].map((p, i) => (
+        <Header />
+        <SelectionBox
+          setIsRedeem={setIsRedeem}
+          lowToHighOrder={lowToHighOrder}
+          setLowToHighOrder={setLowToHighOrder}
+          categories={categories}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          setDeviceButtons={setDeviceButtons}
+          pageNumbersString={pageNumbersString}
+          deviceButtons={deviceButtons}
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          lastPage={packedFilteredProducts.length - 1}
+          productsAmount={productsAmount}
+        />
+        {productsAmount ? (
+          <section className={styles.section}>
+            <div className={styles.productsGrid}>
+              {packedFilteredProducts[pageNumber].map((p, i) => (
                 <Product key={isRedeem ? i : p._id} product={p} />
-              ))
-            ) : (
-              <div className='marginMedium'>No products available</div>
-            )}
-          </div>
-          <div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
-            <span>{pageIndexesString}</span>
-            <div>
-              {!!pageNumber && (
-                <ArrowPrevious
-                  className={styles.arrow}
-                  onClick={() => setPageNumber(pn => pn - 1)}
-                />
-              )}
-              {pageNumber < packedFilteredProducts.length - 1 && (
-                <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
-              )}
+              ))}
             </div>
-          </div>
-        </section>
+            <NavigationFooter
+              pageNumber={pageNumber}
+              setPageNumber={setPageNumber}
+              pageNumbersString={pageNumbersString}
+              lastPage={packedFilteredProducts.length - 1}
+            />
+          </section>
+        ) : (
+          <div style={{margin: '5vw', textAlign: 'center'}}>No products available</div>
+        )}
       </main>
-      <footer className={styles.footer}>
-        <a
-          target='_blank'
-          rel='noreferrer'
-          href='https://github.com/GuidoGlielmi/Aerolab-challenge'
-        >
-          Guido Glielmi&apos;s GitHub Repository
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
+
+const Header = () => (
+  <header className={styles.header}>
+    <img src='/assets/header-x1.png' width='100%' alt='header image' />
+    <h1>Electronics</h1>
+  </header>
+);
+
+const SelectionBox = ({
+  setIsRedeem,
+  lowToHighOrder,
+  setLowToHighOrder,
+  categories,
+  selectedCategory,
+  setSelectedCategory,
+  setDeviceButtons,
+  pageNumbersString,
+  deviceButtons,
+  pageNumber,
+  setPageNumber,
+  lastPage,
+  productsAmount,
+}) => (
+  <div className={styles.filter}>
+    <div>
+      <span className={`${styles.productsAmount} smallFont`}>{pageNumbersString}</span>
+      <div className={styles.filterButtonsBox}>
+        <span>Sort by:</span>
+        <Button action={() => setIsRedeem(pr => !pr)}>Most Recent</Button>
+        {orders.map(o => (
+          <Button key={o} state={lowToHighOrder === o} action={() => setLowToHighOrder(o)}>
+            {o}
+          </Button>
+        ))}
+        <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+          <option value=''>Category</option>
+          {categories.map((c, index) => (
+            <option key={index}>{c}</option>
+          ))}
+        </select>
+      </div>
+      <div className={`${styles.deviceButtons} columnContainer`}>
+        <div className='marginMedium'>
+          <Button action={() => setDeviceButtons(ps => !ps)}>Sort By</Button>
+        </div>
+        {deviceButtons && (
+          <div
+            style={{alignItems: 'center'}}
+            className={`${styles.filterVariables} columnContainer`}
+          >
+            <Button action={() => setIsRedeem(ps => !ps)}>Most Recent</Button>
+            <Button action={() => setLowToHighOrder(true)}>Lowest price</Button>
+            <Button action={() => setLowToHighOrder(false)}>Highest price</Button>
+            <select
+              className={`marginSmall`}
+              value={selectedCategory}
+              onChange={e => setSelectedCategory(e.target.value)}
+            >
+              <option value=''>Category</option>
+              {categories.map((c, index) => (
+                <option key={index}>{c}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+    </div>
+    {productsAmount && (
+      <Arrows pageNumber={pageNumber} setPageNumber={setPageNumber} lastPage={lastPage} />
+    )}
+  </div>
+);
+
+const Arrows = ({pageNumber, setPageNumber, lastPage}) => (
+  <div>
+    {!!pageNumber && (
+      <div
+        style={{filter: 'drop-shadow(0 0 1px blue)'}}
+        onClick={() => setPageNumber(0)}
+        className={styles.arrow}
+      >
+        <ArrowPrevious />
+      </div>
+    )}
+    {!!pageNumber && (
+      <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(pn => pn - 1)} />
+    )}
+    {pageNumber < lastPage && (
+      <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
+    )}
+    {pageNumber !== lastPage && (
+      <div
+        style={{filter: 'drop-shadow(0 0 1px red)'}}
+        className={styles.arrow}
+        onClick={() => setPageNumber(lastPage)}
+      >
+        <ArrowNext />
+      </div>
+    )}
+  </div>
+);
+
+const NavigationFooter = ({pageNumber, setPageNumber, pageNumbersString, lastPage}) => (
+  <div className={`${styles.productsAmountFooter} rowContainer smallFont`}>
+    <span>{pageNumbersString}</span>
+    <div>
+      {!!pageNumber && (
+        <ArrowPrevious className={styles.arrow} onClick={() => setPageNumber(pn => pn - 1)} />
+      )}
+      {pageNumber < lastPage && (
+        <ArrowNext className={styles.arrow} onClick={() => setPageNumber(pn => pn + 1)} />
+      )}
+    </div>
+  </div>
+);
+
+const Footer = () => (
+  <footer className={styles.footer}>
+    <a target='_blank' rel='noreferrer' href='https://github.com/GuidoGlielmi/Aerolab-challenge'>
+      Guido Glielmi&apos;s GitHub Repository
+    </a>
+  </footer>
+);
 
 export async function getRequest(url) {
   const responseRaw = await fetch(url, {
@@ -174,13 +229,9 @@ export async function getRequest(url) {
 }
 export async function getStaticProps() {
   try {
-    // const user = await getRequest('https://coding-challenge-api.aerolab.co/user/me');
     const products = await getRequest('https://coding-challenge-api.aerolab.co/products');
     return {
-      props: {
-        // user,
-        products,
-      },
+      props: {products},
       revalidate: 1,
     };
   } catch (e) {
@@ -193,14 +244,12 @@ function packer(arr) {
   const pack = [];
   const indexNumbers = [];
   while (newArr.length) {
-    const newElements = newArr.splice(0, productAmountPerPage);
-    pack.push(newElements);
-    if (newElements.length === 1) {
-      indexNumbers.push([arr.length]);
-      break;
-    }
+    const newPack = newArr.splice(0, productAmountPerPage);
+    pack.push(newPack);
     const lastNumber = indexNumbers[indexNumbers.length - 1]?.[1] || 0;
-    indexNumbers.push([lastNumber + 1, lastNumber + newElements.length]);
+    indexNumbers.push(
+      newPack.length === 1 ? [lastNumber + 1] : [lastNumber + 1, lastNumber + newPack.length],
+    );
   }
   return [pack, indexNumbers];
 }

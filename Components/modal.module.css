@@ -10,15 +10,16 @@
   height: 100vh;
   width: 100vw;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1;
+  z-index: 10;
 }
 .modal {
   max-width: 60%;
   min-width: 40%;
   box-shadow: 0px 0px 50px -25px rgb(0, 0, 0);
+  font-size: var(--global-font-medium);
 }
 
-.modalHeader {
+.modal > div:first-child {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -26,6 +27,7 @@
   color: rgb(247, 247, 247);
   font-size: x-large;
   border-radius: 5px 5px 0 0;
+  padding: 20px;
 }
 .closeIcon {
   width: 4%;
@@ -34,30 +36,23 @@
   cursor: pointer;
 }
 
-.modalContent {
+.modal h3 {
+  font-size: 1.1em;
+}
+
+.modal > div:last-child {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 20px;
+  padding: 3%;
   background-color: rgb(240, 240, 240);
   border-radius: 0 0 5px 5px;
 }
-.content,
-.title {
-  margin: 0;
-  padding: 20px;
-}
-.content {
-  font-size: larger;
-  padding-bottom: 5px;
-}
-.btnContainer {
-  display: flex;
-  justify-content: center;
-  padding-bottom: 20px;
-  width: 40%;
-}
 
-.btn {
+.modal button {
+  padding-bottom: 20px;
+  width: 25%;
   padding: 10px 40px;
   border: none;
   border-radius: 3px;
@@ -67,4 +62,7 @@
 }
 .invalidInput {
   border: 2px rgb(180, 0, 0) solid;
+}
+.msgError {
+  color: rgb(180, 0, 0);
 }

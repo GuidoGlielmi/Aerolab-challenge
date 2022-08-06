@@ -1,19 +1,40 @@
+:root {
+  --global-font-small: 0.6rem;
+  --global-font-medium: 0.8rem;
+  --global-font-large: 1rem;
+}
 html,
 body {
-  padding: 0;
-  margin: 0;
   background: rgba(245, 245, 245, 1);
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
     Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   font-weight: 600;
 }
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  color: rgb(50, 50, 50);
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--global-font-medium);
+}
 a {
   color: inherit;
   text-decoration: none;
 }
-* {
-  box-sizing: border-box;
+button {
+  transition: all 0.2s ease;
 }
+button:hover {
+  filter: brightness(150%) sepia(10%);
+}
+
 .bigFont {
   font-size: 4rem;
 }
@@ -111,4 +132,18 @@ a {
   background-color: #232f3e;
   color: white;
   cursor: pointer;
+}
+@media (min-width: 768px) {
+  :root {
+    --global-font-small: 0.8rem;
+    --global-font-medium: 1rem;
+    --global-font-large: 1.25rem;
+  }
+}
+@media (min-width: 1200px) {
+  :root {
+    --global-font-small: 1rem;
+    --global-font-medium: 1.25rem;
+    --global-font-large: 1.5rem;
+  }
 }

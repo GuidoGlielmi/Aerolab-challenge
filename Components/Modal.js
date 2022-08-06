@@ -6,10 +6,14 @@ const Modal = ({onConfirm, closeModal, invalidInput, pointsAmount}) => {
     onConfirm();
   }
   return (
-    <div className={styles.background}>
+    <div
+      className={styles.background}
+      id='modal'
+      onClick={e => e.target.id === 'modal' && closeModal()}
+    >
       <div className={styles.modal}>
-        <div className={styles.modalHeader}>
-          <h3 className={styles.title}>Add points</h3>
+        <div>
+          <h3>Add points</h3>
           <img
             onClick={closeModal}
             className={styles.closeIcon}
@@ -17,25 +21,19 @@ const Modal = ({onConfirm, closeModal, invalidInput, pointsAmount}) => {
             alt=''
           />
         </div>
-        <div className={styles.modalContent}>
-          <p className={styles.content}>Enter an amount</p>
-          <form onSubmit={submitHandler} className='marginMedium columnContainer'>
-            <input
-              ref={pointsAmount}
-              className={invalidInput ? styles.invalidInput : ''}
-              type='text'
-            />
+        <div>
+          <p>Enter an amount</p>
+          <form onSubmit={submitHandler}>
+            <input ref={pointsAmount} className={invalidInput ? styles.invalidInput : ''} />
             {invalidInput && (
-              <p style={{color: 'rgb(180, 0, 0)'}} className='marginSmall'>
+              <p className={invalidInput ? styles.msgError : ''}>
                 Only 1000, 5000 or 7500 points allowed
               </p>
             )}
           </form>
-          <div className={styles.btnContainer}>
-            <button className={styles.btn} onClick={onConfirm}>
-              Ok
-            </button>
-          </div>
+          <button className={styles.btn} onClick={onConfirm}>
+            Ok
+          </button>
         </div>
       </div>
     </div>
